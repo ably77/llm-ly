@@ -8,5 +8,4 @@ resources:
 - gemini
 - mistral
 - anthropic
-- chatbot
 - routing
