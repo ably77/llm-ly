@@ -189,13 +189,11 @@ spec:
                     icon: "fas fa-brain"
                     items:
                       - name: "General Chatbot"
-                        subtitle: "requires x-token header"
                         icon: "far fa-question-circle"
                         tag: "ai-gateway"
                         url: "https://general-chatbot.kapoozi.com"
                         target: "_blank" # optional html a tag target attribute
                       - name: "Language Translator Chatbot"
-                        subtitle: "requires x-token header"
                         icon: "fas fa-language"
                         tag: "ai-gateway"
                         url: "https://language-chatbot.kapoozi.com"
