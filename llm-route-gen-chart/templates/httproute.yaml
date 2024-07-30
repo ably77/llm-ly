@@ -1,11 +1,9 @@
-{{- $randomSeed := printf "%s-%d" .Release.Name .Release.Revision }}
-{{- $baseName := randAlphaNum 8 | lower | default (randAlphaNum 8 | lower) | trunc 8 }}
+{{- $baseName := randAlphaNum 4 | lower }}
 {{- $generatedName := printf "ezai-%s" $baseName }}
 {{- $generatedHostname := printf "%s.kapoozi.com" $baseName }}
 {{- $name := .Values.metadata.name | default $generatedName }}
 {{- $namespace := .Release.Namespace }}
 {{- $hostnames := .Values.spec.hostnames | default (list $generatedHostname) }}
-{{- $randomPath := printf "/%s/%s" $baseName .backendRefName }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -27,6 +25,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
+    {{- $randomPath := printf "/%s/%s" $baseName .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
