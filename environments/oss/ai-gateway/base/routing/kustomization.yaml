@@ -7,3 +7,4 @@ resources:
 - ai-gateway-ns.yaml
 - ezai-route.yaml
 - ai-gateway-route.yaml
+- random-generated-route.yaml
