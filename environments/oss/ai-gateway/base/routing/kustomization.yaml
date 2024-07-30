@@ -4,9 +4,6 @@ kind: Kustomization
 
 # list of resources to be Applied
 resources:
-- openai
-- gemini
-- mistral
-- anthropic
-- chatbot
-- routing
+- ai-gateway-ns.yaml
+- ezai-route.yaml
+- ai-gateway-https-route.yaml
