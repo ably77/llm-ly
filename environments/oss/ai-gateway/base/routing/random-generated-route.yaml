@@ -24,6 +24,7 @@ spec:
             - backendRefName: openai
               pathPrefix: /openai
               routeOptionName: openai-route-policies
+              useRandomPathPrefix: false # Toggle to use random path prefix
             - backendRefName: gemini
               pathPrefix: /gemini
               routeOptionName: gemini-route-policies
