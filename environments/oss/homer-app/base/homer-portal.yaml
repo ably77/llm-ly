@@ -184,19 +184,21 @@ spec:
                         keywords: "argocd"
                         url: "https://argocd.glootest.com/argo"
                         target: "_blank" # optional html a tag target attribute
-                  
-                  - name: "Web Applications"
-                    icon: "fas fa-cloud"
+
+                  - name: "AI Gateway Workloads"
+                    icon: "fas fa-brain"
                     items:
-                      - name: "httpbin"
-                        icon: "far fa-window-maximize"
-                        tag: "httpbin"
-                        url: "https://httpbin.glootest.com"
+                      - name: "General Chatbot"
+                        subtitle: "requires x-token header"
+                        icon: "far fa-question-circle"
+                        tag: "ai-gateway"
+                        url: "https://general-chatbot.glootest.com"
                         target: "_blank" # optional html a tag target attribute
-                      - name: "Bookinfo"
-                        icon: "fas fa-book-reader"
-                        tag: "bookinfo"
-                        url: "https://bookinfo.glootest.com/productpage"
+                      - name: "Language Translator Chatbot"
+                        subtitle: "requires x-token header"
+                        icon: "fas fa-language"
+                        tag: "ai-gateway"
+                        url: "https://language-chatbot.glootest.com"
                         target: "_blank" # optional html a tag target attribute
                     
   syncPolicy:

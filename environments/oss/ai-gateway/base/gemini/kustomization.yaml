@@ -4,6 +4,5 @@ kind: Kustomization
 
 # list of resources to be Applied
 resources:
-- bookinfo-ns.yaml
-- bookinfo.yaml
-- bookinfo-https.yaml
+- gemini-route-policies.yaml
+- gemini-upstream.yaml

@@ -1,0 +1,9 @@
+apiVersion: gateway.solo.io/v1
+kind: RouteOption
+metadata:
+  name: language-chatbot-route-policies
+  namespace: ai-chatbot
+spec:
+  options:
+                
+    

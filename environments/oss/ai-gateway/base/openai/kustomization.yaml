@@ -4,8 +4,5 @@ kind: Kustomization
 
 # list of resources to be Applied
 resources:
-- httpbin-active.yaml
-- httpbin-ns.yaml
-- httpbin-route.yaml
-- httpbin-transformation-policy.yaml
-- httpbin-add-header-policy.yaml
+- openai-route-policies.yaml
+- openai-upstream.yaml
