@@ -21,6 +21,13 @@ waves:
       -  $env_path/ai-gateway/init.sh
       post_deploy:
       -  $env_path/ai-gateway/test.sh  
+  - name: ai-gateway-routes
+    location: $env_path/ai-gateway-routes/base
+    scripts:
+      pre_deploy: 
+      -  $env_path/ai-gateway-routes/init.sh
+      post_deploy:
+      -  $env_path/ai-gateway-routes/test.sh  
   - name: chatbot
     location: $env_path/chatbot/base
     scripts:
