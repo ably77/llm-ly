@@ -1,31 +1,36 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: ezai-https
-  namespace: ai-gateway
+  name: {{ .Values.metadata.name | default "ezai-https" }}
+  namespace: {{ .Values.metadata.namespace | default "ai-gateway" }}
   labels:
-    example: ai-gateway-route
-    gateway: https
+{{- range $key, $value := .Values.metadata.labels }}
+    {{ $key }}: {{ $value }}
+{{- end }}
 spec:
   hostnames:
-  {{- toYaml .Values.hostnames | nindent 4 }}
+{{- range .Values.spec.hostnames }}
+    - {{ . }}
+{{- end }}
   parentRefs:
-    - name: {{ .Values.parentRef.name }}
-      namespace: {{ .Values.parentRef.namespace }}
+{{- range .Values.spec.parentRefs }}
+    - name: {{ .name | default "https" }}
+      namespace: {{ .namespace | default "gloo-system" }}
+{{- end }}
   rules:
-    {{- range .Values.routes }}
+{{- range .Values.spec.rules }}
     - backendRefs:
-        - group: {{ .backendGroup }}
-          kind: {{ .backendKind }}
-          name: {{ .name }}
+        - group: gloo.solo.io
+          kind: Upstream
+          name: {{ .backendRefName }}
       matches:
         - path:
             type: PathPrefix
-            value: {{ .path }}
+            value: {{ .pathPrefix }}
       filters:
         - type: ExtensionRef
           extensionRef:
-            group: {{ .routeOptionGroup }}
-            kind: {{ .routeOptionKind }}
-            name: {{ .name }}-route-policies
-    {{- end }}
+            group: gateway.solo.io
+            kind: RouteOption
+            name: {{ .routeOptionName }}
+{{- end }}
