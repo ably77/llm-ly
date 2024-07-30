@@ -19,7 +19,7 @@ spec:
         metadata:
           labels:
             example: copycat-route
-            revision: '1'
+            revision: "1"
         spec:
           hostnames:
             - "ezai.kapoozi.com"
