@@ -14,15 +14,15 @@ The `gloo-edge/httpbin-bookinfo` environment deploys Gloo Edge along with the bo
 
 ## Application description
 
-The RouteTables for applications exposed in this demo are defining non-wildcard hosts which follow the pattern `<app>.glootest.com`. You can map these hostnames to your gateway IP address in your DNS service of choice (i.e. Route53, Cloudflare), or you can follow the methods below to modify your `/etc/hosts` locally depending on your cluster LoadBalancer configuration.
+The RouteTables for applications exposed in this demo are defining non-wildcard hosts which follow the pattern `<app>.kapoozi.com`. You can map these hostnames to your gateway IP address in your DNS service of choice (i.e. Route53, Cloudflare), or you can follow the methods below to modify your `/etc/hosts` locally depending on your cluster LoadBalancer configuration.
 
 Applications Exposed using this demo:
-- ArgoCD at `https://argocd.glootest.com/argo`
+- ArgoCD at `https://argocd.kapoozi.com/argo`
     - argocd credentials:
     - user: admin
     - password: solo.io
-- bookinfo at `https://bookinfo.glootest.com/productpage`
-- httpbin at `https://httpbin.glootest.com/get`
+- bookinfo at `https://bookinfo.kapoozi.com/productpage`
+- httpbin at `https://httpbin.kapoozi.com/get`
     - okta credentials:
     - user: jdoe@solo.io
     - password: gloo-admin
@@ -41,7 +41,7 @@ echo ${GATEWAY_IP}
 Modify /etc/hosts on your local machine (this will require sudo privileges), or configure DNS to point to your Gateway IP
 ```
 cat <<EOF | sudo tee -a /etc/hosts
-${GATEWAY_IP} argocd.glootest.com httpbin.glootest.com bookinfo.glootest.com
+${GATEWAY_IP} argocd.kapoozi.com httpbin.kapoozi.com bookinfo.kapoozi.com
 EOF
 ```
 
@@ -49,7 +49,7 @@ EOF
 modify /etc/hosts on your local machine (this will require sudo privileges)
 ```
 cat <<EOF | sudo tee -a /etc/hosts
-127.0.0.1 argocd.glootest.com httpbin.glootest.com bookinfo.glootest.com
+127.0.0.1 argocd.kapoozi.com httpbin.kapoozi.com bookinfo.kapoozi.com
 EOF
 ```
 
@@ -74,7 +74,7 @@ access the gateway at https://localhost:8443
 Note: For routes that are configured with a specific host, pass in the Host header using curl `-H "Host: <host>` or add the following entry into your /etc/hosts when using this method
 ```
 cat <<EOF | sudo tee -a /etc/hosts
-127.0.0.1 argocd.glootest.com httpbin.glootest.com bookinfo.glootest.com
+127.0.0.1 argocd.kapoozi.com httpbin.kapoozi.com bookinfo.kapoozi.com
 EOF
 ```
 

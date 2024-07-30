@@ -8,7 +8,7 @@ metadata:
     gateway: https
 spec:
   hostnames:
-  - "ai-gateway.glootest.com"
+  - "ai-gateway.kapoozi.com"
   parentRefs:
     - name: https
       namespace: gloo-system
