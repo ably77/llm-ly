@@ -1,0 +1,14 @@
+apiVersion: v2
+name: llm-route-gen-chart
+description: A Helm chart for managing HTTPRoute for AI Gateway
+type: application
+version: 0.1.0
+appVersion: "1.0"
+keywords:
+  - kubernetes
+  - ai
+  - gateway
+  - route
+maintainers:
+  - name: Alex Ly
+    email: Alexbrucely@gmail.com

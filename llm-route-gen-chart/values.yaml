@@ -1,0 +1,32 @@
+hostnames:
+  - "ezai.kapoozi.com"
+
+parentRef:
+  name: https
+  namespace: gloo-system
+
+routes:
+  - name: openai
+    path: /openai
+    backendGroup: gloo.solo.io
+    backendKind: Upstream
+    routeOptionGroup: gateway.solo.io
+    routeOptionKind: RouteOption
+  - name: gemini
+    path: /gemini
+    backendGroup: gloo.solo.io
+    backendKind: Upstream
+    routeOptionGroup: gateway.solo.io
+    routeOptionKind: RouteOption
+  - name: claude
+    path: /claude
+    backendGroup: gloo.solo.io
+    backendKind: Upstream
+    routeOptionGroup: gateway.solo.io
+    routeOptionKind: RouteOption
+  - name: mistral
+    path: /mistral
+    backendGroup: gloo.solo.io
+    backendKind: Upstream
+    routeOptionGroup: gateway.solo.io
+    routeOptionKind: RouteOption
