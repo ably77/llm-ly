@@ -24,16 +24,19 @@ spec:
             - backendRefName: openai
               pathPrefix: /openai
               routeOptionName: openai-route-policies
-              useRandomPathPrefix: true # Toggle to use random path prefix
+              useRandomPathPrefix: true # Toggle to append a generated path prefix
             - backendRefName: gemini
               pathPrefix: /gemini
               routeOptionName: gemini-route-policies
+              useRandomPathPrefix: true # Toggle to append a generated path prefix
             - backendRefName: claude
               pathPrefix: /claude
               routeOptionName: claude-route-policies
+              useRandomPathPrefix: true # Toggle to append a generated path prefix
             - backendRefName: mistral
               pathPrefix: /mistral
-              routeOptionName: mistral-route-policies        
+              routeOptionName: mistral-route-policies       
+              useRandomPathPrefix: true # Toggle to append a generated path prefix 
   syncPolicy:
     automated:
       prune: true
