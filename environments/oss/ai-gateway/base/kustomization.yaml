@@ -6,6 +6,7 @@ kind: Kustomization
 resources:
 - ai-gateway-ns.yaml
 - ai-gateway-https.yaml
+- ezai-https.yaml
 - openai
 - gemini
 - chatbot
