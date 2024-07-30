@@ -1,5 +1,5 @@
 {{- $randomSeed := printf "%s-%d" .Release.Name .Release.Revision }}
-{{- $baseName := randAlphaNum 4 | lower | default (randAlphaNum 4 | lower) | trunc 4 }}
+{{- $baseName := randAlphaNum 8 | lower | default (randAlphaNum 8 | lower) | trunc 8 }}
 {{- $generatedName := printf "ezai-%s" $baseName }}
 {{- $generatedHostname := printf "%s.kapoozi.com" $baseName }}
 {{- $name := .Values.metadata.name | default $generatedName }}
