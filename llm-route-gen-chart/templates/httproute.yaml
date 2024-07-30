@@ -1,10 +1,9 @@
-{{- $generatedName := printf "ezai-%s" (randAlphaNum 8 | lower) }}
-{{- $name := .Values.metadata.name | default $generatedName }}
+{{- $name := printf "foo-%s" (randAlphaNum 8 | lower) }}
 {{- $namespace := .Release.Namespace }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: {{ $name }}
+  name: {{ .Values.metadata.name | default $name }}
   namespace: {{ .Values.metadata.namespace | default $namespace }}
   labels:
 {{- range $key, $value := .Values.metadata.labels }}
