@@ -1,5 +1,6 @@
-{{- $generatedName := printf "ezai-%s" (randAlphaNum 4 | lower) }}
-{{- $generatedHostname := printf "ezai-%s.kapoozi.com" (randAlphaNum 4 | lower) }}
+{{- $baseName := printf "ezai-%s" (randAlphaNum 8 | lower) }}
+{{- $generatedName := $baseName }}
+{{- $generatedHostname := printf "%s.kapoozi.com" $baseName }}
 {{- $name := .Values.metadata.name | default $generatedName }}
 {{- $namespace := .Release.Namespace }}
 {{- $hostnames := .Values.spec.hostnames | default (list $generatedHostname) }}
@@ -24,6 +25,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
+    {{- $pathPrefix := printf "/%s" $baseName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
@@ -31,7 +33,7 @@ spec:
       matches:
         - path:
             type: PathPrefix
-            value: {{ .pathPrefix }}
+            value: {{ if .useRandomPathPrefix }}{{ $pathPrefix }}{{ else }}{{ .pathPrefix }}{{ end }}
       filters:
         - type: ExtensionRef
           extensionRef:
