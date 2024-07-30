@@ -28,15 +28,15 @@ spec:
             - backendRefName: gemini
               pathPrefix: /gemini
               routeOptionName: gemini-route-policies
-              useRandomPathPrefix: true # Toggle to append a generated path prefix
+              useRandomPathPrefix: true 
             - backendRefName: claude
               pathPrefix: /claude
               routeOptionName: claude-route-policies
-              useRandomPathPrefix: true # Toggle to append a generated path prefix
+              useRandomPathPrefix: true
             - backendRefName: mistral
               pathPrefix: /mistral
               routeOptionName: mistral-route-policies       
-              useRandomPathPrefix: true # Toggle to append a generated path prefix 
+              useRandomPathPrefix: true
   syncPolicy:
     automated:
       prune: true
