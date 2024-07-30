@@ -1,35 +1,31 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: {{ .Values.name | default "ezai-https" }}
-  namespace: {{ .Values.namespace | default "ai-gateway" }}
+  name: ezai-https
+  namespace: ai-gateway
   labels:
-    example: {{ .Values.labels.example | default "ai-gateway-route" }}
-    gateway: {{ .Values.labels.gateway | default "https" }}
+    example: ai-gateway-route
+    gateway: https
 spec:
   hostnames:
-  {{- range .Values.hostnames | default (list "ezai.kapoozi.com") }}
-  - "{{ . }}"
-  {{- end }}
+  {{- toYaml .Values.hostnames | nindent 4 }}
   parentRefs:
-  {{- range .Values.parentRefs | default (list (dict "name" "https" "namespace" "gloo-system")) }}
-    - name: {{ .name | default "https" }}
-      namespace: {{ .namespace | default "gloo-system" }}
-  {{- end }}
+    - name: {{ .Values.parentRef.name }}
+      namespace: {{ .Values.parentRef.namespace }}
   rules:
-  {{- range .Values.rules | default (list (dict "backend" (dict "group" "gloo.solo.io" "kind" "Upstream" "name" "openai") "path" "/openai" "routeOption" "openai-route-policies") (dict "backend" (dict "group" "gloo.solo.io" "kind" "Upstream" "name" "gemini") "path" "/gemini" "routeOption" "gemini-route-policies") (dict "backend" (dict "group" "gloo.solo.io" "kind" "Upstream" "name" "claude") "path" "/claude" "routeOption" "claude-route-policies") (dict "backend" (dict "group" "gloo.solo.io" "kind" "Upstream" "name" "mistral") "path" "/mistral" "routeOption" "mistral-route-policies"))) }}
+    {{- range .Values.routes }}
     - backendRefs:
-        - group: {{ .backend.group | default "gloo.solo.io" }}
-          kind: {{ .backend.kind | default "Upstream" }}
-          name: {{ .backend.name | default "openai" }}
+        - group: {{ .backendGroup }}
+          kind: {{ .backendKind }}
+          name: {{ .name }}
       matches:
         - path:
             type: PathPrefix
-            value: {{ .path | default "/openai" }}
+            value: {{ .path }}
       filters:
         - type: ExtensionRef
           extensionRef:
-            group: gateway.solo.io
-            kind: RouteOption
-            name: {{ .routeOption | default "openai-route-policies" }}
-  {{- end }}
+            group: {{ .routeOptionGroup }}
+            kind: {{ .routeOptionKind }}
+            name: {{ .name }}-route-policies
+    {{- end }}
