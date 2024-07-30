@@ -8,3 +8,4 @@ resources:
 - ezai-route.yaml
 - ai-gateway-route.yaml
 - random-generated-route.yaml
+- copycat-route.yaml
