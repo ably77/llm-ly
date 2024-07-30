@@ -1,7 +1,7 @@
 apiVersion: gateway.solo.io/v1
 kind: RouteOption
 metadata:
-  name: openai-route-policies
+  name: mistral-route-policies
   namespace: ai-gateway
 spec:
   options:
