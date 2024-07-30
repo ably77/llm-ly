@@ -15,7 +15,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: upstream-tls
+          - name: cf-upstream-tls
             kind: Secret
       allowedRoutes:
         namespaces:
