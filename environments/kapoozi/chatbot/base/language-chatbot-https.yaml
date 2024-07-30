@@ -20,6 +20,9 @@ spec:
         - path:
             type: PathPrefix
             value: /
+          headers:
+            - name: "x-access-code"
+              value: "chatbot"
       #filters:
       #- type: ExtensionRef
       #  extensionRef:
