@@ -1,32 +1,32 @@
+name: ezai-https
+
+namespace: ai-gateway
+
+labels:
+  example: custom-ai-gateway-route
+  gateway: custom-https
+
 hostnames:
   - "ezai.kapoozi.com"
 
-parentRef:
-  name: https
-  namespace: gloo-system
+parentRefs:
+  - name: custom-https
+    namespace: custom-gloo-system
 
-routes:
-  - name: openai
+rules:
+  - backend:
+      name: openai
     path: /openai
-    backendGroup: gloo.solo.io
-    backendKind: Upstream
-    routeOptionGroup: gateway.solo.io
-    routeOptionKind: RouteOption
-  - name: gemini
+    routeOption: custom-openai-route-policies
+  - backend:
+      name: gemini
     path: /gemini
-    backendGroup: gloo.solo.io
-    backendKind: Upstream
-    routeOptionGroup: gateway.solo.io
-    routeOptionKind: RouteOption
-  - name: claude
+    routeOption: custom-gemini-route-policies
+  - backend:
+      name: claude
     path: /claude
-    backendGroup: gloo.solo.io
-    backendKind: Upstream
-    routeOptionGroup: gateway.solo.io
-    routeOptionKind: RouteOption
-  - name: mistral
+    routeOption: custom-claude-route-policies
+  - backend:
+      name: mistral
     path: /mistral
-    backendGroup: gloo.solo.io
-    backendKind: Upstream
-    routeOptionGroup: gateway.solo.io
-    routeOptionKind: RouteOption
+    routeOption: custom-mistral-route-policies
