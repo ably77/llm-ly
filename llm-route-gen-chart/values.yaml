@@ -5,8 +5,7 @@ metadata:
     example: ai-gateway-route
     gateway: https
 spec:
-  hostnames:
-    - "ezai.kapoozi.com"
+  hostnames: [] # Placeholder, will be replaced by generated hostname if not provided
   parentRefs:
     - name: https
       namespace: gloo-system
