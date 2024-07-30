@@ -1,0 +1,10 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  name: claude
+  namespace: ai-gateway
+spec:
+    static:
+      hosts:
+      - addr: api.anthropic.com
+        port: 443

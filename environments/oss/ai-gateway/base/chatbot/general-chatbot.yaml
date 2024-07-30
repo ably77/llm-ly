@@ -42,7 +42,7 @@ spec:
           - name: "PORT"
             value: "3000"
           - name: OPENAI_ENDPOINT
-            value: "https://ai-gateway.kapoozi.com/openai"
+            value: "https://ezai.kapoozi.com/openai"
           - name: ANTHROPIC_ENDPOINT
             value: "https://ai-gateway.kapoozi.com/claude"
           # used with gloo api-key extauth policy to demonstrate api-key masking

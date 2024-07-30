@@ -41,3 +41,31 @@ spec:
             group: gateway.solo.io
             kind: RouteOption
             name: gemini-route-policies
+    - backendRefs:
+        - group: gloo.solo.io
+          kind: Upstream
+          name: claude
+      matches:
+        - path:
+            type: PathPrefix
+            value: /claude
+      filters:
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.solo.io
+            kind: RouteOption
+            name: claude-route-policies
+    - backendRefs:
+        - group: gloo.solo.io
+          kind: Upstream
+          name: mistral
+      matches:
+        - path:
+            type: PathPrefix
+            value: /mistral
+      filters:
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.solo.io
+            kind: RouteOption
+            name: mistral-route-policies

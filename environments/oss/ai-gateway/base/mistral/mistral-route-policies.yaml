@@ -1,0 +1,9 @@
+apiVersion: gateway.solo.io/v1
+kind: RouteOption
+metadata:
+  name: openai-route-policies
+  namespace: ai-gateway
+spec:
+  options:
+    hostRewrite: 'api.mistral.ai'
+    prefixRewrite: '/v1/embeddings'

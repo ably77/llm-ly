@@ -1,0 +1,9 @@
+apiVersion: gateway.solo.io/v1
+kind: RouteOption
+metadata:
+  name: claude-route-policies
+  namespace: ai-gateway
+spec:
+  options:
+    hostRewrite: 'api.anthropic.com'
+    prefixRewrite: '/v1/messages'
