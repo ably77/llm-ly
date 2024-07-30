@@ -6,4 +6,4 @@ kind: Kustomization
 resources:
 - ai-gateway-ns.yaml
 - ezai-route.yaml
-- ai-gateway-https-route.yaml
+- ai-gateway-route.yaml
