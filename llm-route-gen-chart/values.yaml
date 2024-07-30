@@ -1,5 +1,4 @@
 metadata:
-  name: ezai-https
   namespace: ai-gateway
   labels:
     example: ai-gateway-route
