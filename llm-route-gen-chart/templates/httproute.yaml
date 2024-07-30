@@ -1,4 +1,4 @@
-{{- $baseName := randAlphaNum 8 | lower }}
+{{- $baseName := randAlphaNum 4 | lower }}
 {{- $generatedName := printf "ezai-%s" $baseName }}
 {{- $generatedHostname := printf "%s.kapoozi.com" $baseName }}
 {{- $name := .Values.metadata.name | default $generatedName }}
