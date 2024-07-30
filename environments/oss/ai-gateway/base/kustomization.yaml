@@ -6,7 +6,8 @@ kind: Kustomization
 resources:
 - ai-gateway-ns.yaml
 - ai-gateway-https.yaml
-- ezai-https.yaml
+#- ezai-https.yaml
+- ezai-route.yaml
 - openai
 - gemini
 - mistral
