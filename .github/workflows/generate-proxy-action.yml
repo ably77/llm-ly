@@ -15,7 +15,7 @@ on:
       use_random_path_prefix:
         description: 'Use random path prefix (true/false)'
         required: false
-        default: 'true'
+        default: 'false'
         type: choice
         options:
           - true
