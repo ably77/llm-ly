@@ -116,4 +116,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update ${APP_NAME} manifest
-          file_pattern: '*.yaml'
+          file_pattern: 'environments/kapoozi/ai-gateway-routes/${APP_NAME}.yaml'
