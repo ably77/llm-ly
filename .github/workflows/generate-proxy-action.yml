@@ -2,24 +2,58 @@ name: Add YAML file with variable replacement
 
 on:
   workflow_dispatch:
+    inputs:
+      hostname:
+        description: 'Hostname'
+        required: false
+      namespace:
+        description: 'Namespace'
+        required: false
+        default: 'argocd'
+      app_name:
+        description: 'Application Name'
+        required: false
+        default: 'ezai-route'
+      gateway_namespace:
+        description: 'Gateway Namespace'
+        required: false
+        default: 'gloo-system'
+      upstream_ref_openai:
+        description: 'Upstream Ref OpenAI'
+        required: false
+        default: 'openai'
+      upstream_ref_gemini:
+        description: 'Upstream Ref Gemini'
+        required: false
+        default: 'gemini'
+      upstream_ref_claude:
+        description: 'Upstream Ref Claude'
+        required: false
+        default: 'claude'
+      upstream_ref_mistral:
+        description: 'Upstream Ref Mistral'
+        required: false
+        default: 'mistral'
+      route_option_openai:
+        description: 'Route Option OpenAI'
+        required: false
+        default: 'openai-route-policies'
+      route_option_gemini:
+        description: 'Route Option Gemini'
+        required: false
+        default: 'gemini-route-policies'
+      route_option_claude:
+        description: 'Route Option Claude'
+        required: false
+        default: 'claude-route-policies'
+      route_option_mistral:
+        description: 'Route Option Mistral'
+        required: false
+        default: 'mistral-route-policies'
 
 jobs:
   add_yaml_file:
     runs-on: ubuntu-latest
-
-    env:
-      HOSTNAME: 'ezai.kapoozi.com'
-      NAMESPACE: 'argocd'
-      APP_NAME: 'ezai-route'
-      GATEWAY_NAMESPACE: 'gloo-system'
-      UPSTREAM_REF_OPENAI: 'openai'
-      UPSTREAM_REF_GEMINI: 'gemini'
-      UPSTREAM_REF_CLAUDE: 'claude'
-      UPSTREAM_REF_MISTRAL: 'mistral'
-      ROUTE_OPTION_OPENAI: 'openai-route-policies'
-      ROUTE_OPTION_GEMINI: 'gemini-route-policies'
-      ROUTE_OPTION_CLAUDE: 'claude-route-policies'
-      ROUTE_OPTION_MISTRAL: 'mistral-route-policies'
 
     steps:
     - name: Checkout repository
@@ -30,7 +64,7 @@ jobs:
       run: echo "::set-output name=suffix::$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)"
 
     - name: Set full application name
-      run: echo "FULL_APP_NAME=${APP_NAME}-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)" >> $GITHUB_ENV
+      run: echo "FULL_APP_NAME=${{ github.event.inputs.app_name }}-${{ steps.suffix.outputs.suffix }}" >> $GITHUB_ENV
 
     - name: Create YAML file with placeholders
       run: |
@@ -40,7 +74,7 @@ jobs:
         kind: Application
         metadata:
           name: ${{ env.FULL_APP_NAME }}
-          namespace: ${NAMESPACE}
+          namespace: ${{ github.event.inputs.namespace }}
           finalizers:
             - resources-finalizer.argocd.argoproj.io
         spec:
@@ -60,33 +94,28 @@ jobs:
                     example: ${{ env.FULL_APP_NAME }}
                 spec:
                   hostnames:
-                    - "${HOSTNAME}"
+                    - "${{ github.event.inputs.hostname }}"
                   parentRefs:
                     - name: https
-                      namespace: ${GATEWAY_NAMESPACE}
+                      namespace: ${{ github.event.inputs.gateway_namespace }}
                   rules:
-                    - backendRefName: ${UPSTREAM_REF_OPENAI}
+                    - backendRefName: ${{ github.event.inputs.upstream_ref_openai }}
                       pathPrefix: /openai
-                      routeOptionName: ${ROUTE_OPTION_OPENAI}
-                    - backendRefName: ${UPSTREAM_REF_GEMINI}
+                      routeOptionName: ${{ github.event.inputs.route_option_openai }}
+                    - backendRefName: ${{ github.event.inputs.upstream_ref_gemini }}
                       pathPrefix: /gemini
-                      routeOptionName: ${ROUTE_OPTION_GEMINI}
-                    - backendRefName: ${UPSTREAM_REF_CLAUDE}
+                      routeOptionName: ${{ github.event.inputs.route_option_gemini }}
+                    - backendRefName: ${{ github.event.inputs.upstream_ref_claude }}
                       pathPrefix: /claude
-                      routeOptionName: ${ROUTE_OPTION_CLAUDE}
-                    - backendRefName: ${UPSTREAM_REF_MISTRAL}
+                      routeOptionName: ${{ github.event.inputs.route_option_claude }}
+                    - backendRefName: ${{ github.event.inputs.upstream_ref_mistral }}
                       pathPrefix: /mistral
-                      routeOptionName: ${ROUTE_OPTION_MISTRAL}        
+                      routeOptionName: ${{ github.event.inputs.route_option_mistral }}        
           syncPolicy:
             automated:
               prune: true
               selfHeal: true
         EOF
-
-    - name: Replace variables in YAML file
-      run: |
-        envsubst < environments/kapoozi/ai-gateway-routes/application.yaml > environments/kapoozi/ai-gateway-routes/application.yaml.tmp
-        mv environments/kapoozi/ai-gateway-routes/application.yaml.tmp environments/kapoozi/ai-gateway-routes/application.yaml
 
     - name: Commit and push changes
       env:
