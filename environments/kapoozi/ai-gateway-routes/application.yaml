@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-route-niR
+  name: ezai-route-yzK
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -19,25 +19,15 @@ spec:
         metadata:
           name: ezai-https
           labels:
-            example: ezai-route-niR
+            example: ezai-route-yzK
         spec:
-                  parentRefs:
+          hostnames:
+            - "ezai.kapoozi.com"
+          parentRefs:
             - name: https
               namespace: gloo-system
           rules:
-            - backendRefName: openai
-              pathPrefix: /openai
-              routeOptionName: openai-route-policies
-            - backendRefName: gemini
-              pathPrefix: /gemini
-              routeOptionName: gemini-route-policies
-            - backendRefName: claude
-              pathPrefix: /claude
-              routeOptionName: claude-route-policies
-            - backendRefName: mistral
-              pathPrefix: /mistral
-              routeOptionName: mistral-route-policies
-          syncPolicy:
+            - backendRefName:               pathPrefix: /              routeOptionName:   syncPolicy:
     automated:
       prune: true
       selfHeal: true
