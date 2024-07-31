@@ -25,7 +25,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
-    {{- $randomPath := printf "/%s/%s" $baseName .backendRefName }}
+    {{- $namePath := printf "/%s/%s" $name .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
@@ -33,7 +33,7 @@ spec:
       matches:
         - path:
             type: PathPrefix
-            value: {{ if .useRandomPathPrefix }}{{ $randomPath }}{{ else }}{{ .pathPrefix }}{{ end }}
+            value: {{ if .useRandomPathPrefix }}{{ $namePath }}{{ else }}{{ .pathPrefix }}{{ end }}
       filters:
         - type: ExtensionRef
           extensionRef:
