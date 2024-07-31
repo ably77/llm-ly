@@ -102,6 +102,8 @@ jobs:
                 values: |
                   metadata:
                     name: "ezai-${RANDOM_STRING}"
+                    labels:
+                      prefixPath: "${RANDOM_STRING}"
                   spec:
                     ${HOSTNAMES}
                     parentRefs:
