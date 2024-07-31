@@ -181,6 +181,11 @@ spec:
                   - name: "AI Gateway Workloads"
                     icon: "fas fa-brain"
                     items:
+                      - name: "LLM Proxy Generator"
+                        icon: "fab fa-git-alt"
+                        tag: "ai-gateway"
+                        url: "https://client.kapoozi.com/invoke/"
+                        target: "_blank" # optional html a tag target attribute
                       - name: "General Chatbot"
                         icon: "far fa-question-circle"
                         tag: "ai-gateway"

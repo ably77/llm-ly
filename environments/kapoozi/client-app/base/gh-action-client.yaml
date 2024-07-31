@@ -66,6 +66,7 @@ spec:
                 "ref": "main",
                 "inputs": {
                   "routes": "openai,gemini,claude,mistral",
+                  "hostname": "example.com", # optional
                   "use_random_path_prefix": "false"
                 }
               }
