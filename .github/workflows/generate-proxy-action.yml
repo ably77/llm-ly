@@ -3,15 +3,11 @@ name: Configure Application Manifest
 on:
   workflow_dispatch:
     inputs:
-      route:
-        description: 'Select the route option'
+      routes:
+        description: 'Select the route options (comma-separated)'
         required: true
-        type: choice
-        options:
-          - openai
-          - gemini
-          - claude
-          - mistral
+        default: 'openai,gemini,claude,mistral'
+        type: string
 
 jobs:
   update-manifest:
@@ -24,29 +20,40 @@ jobs:
       - name: Render manifest based on input
         id: render_manifest
         run: |
-          ROUTE_NAME=${{ github.event.inputs.route }}
-          case $ROUTE_NAME in
-            "openai")
-              BACKEND_REF_NAME="openai"
-              PATH_PREFIX="/openai"
-              ROUTE_OPTION_NAME="openai-route-policies"
-              ;;
-            "gemini")
-              BACKEND_REF_NAME="gemini"
-              PATH_PREFIX="/gemini"
-              ROUTE_OPTION_NAME="gemini-route-policies"
-              ;;
-            "claude")
-              BACKEND_REF_NAME="claude"
-              PATH_PREFIX="/claude"
-              ROUTE_OPTION_NAME="claude-route-policies"
-              ;;
-            "mistral")
-              BACKEND_REF_NAME="mistral"
-              PATH_PREFIX="/mistral"
-              ROUTE_OPTION_NAME="mistral-route-policies"
-              ;;
-          esac
+          ROUTES=${{ github.event.inputs.routes }}
+          IFS=',' read -ra ROUTE_ARRAY <<< "$ROUTES"
+
+          RULES=""
+          for ROUTE_NAME in "${ROUTE_ARRAY[@]}"; do
+            case $ROUTE_NAME in
+              "openai")
+                BACKEND_REF_NAME="openai"
+                PATH_PREFIX="/openai"
+                ROUTE_OPTION_NAME="openai-route-policies"
+                ;;
+              "gemini")
+                BACKEND_REF_NAME="gemini"
+                PATH_PREFIX="/gemini"
+                ROUTE_OPTION_NAME="gemini-route-policies"
+                ;;
+              "claude")
+                BACKEND_REF_NAME="claude"
+                PATH_PREFIX="/claude"
+                ROUTE_OPTION_NAME="claude-route-policies"
+                ;;
+              "mistral")
+                BACKEND_REF_NAME="mistral"
+                PATH_PREFIX="/mistral"
+                ROUTE_OPTION_NAME="mistral-route-policies"
+                ;;
+            esac
+
+            RULES="${RULES}
+            - backendRefName: $BACKEND_REF_NAME
+              pathPrefix: $PATH_PREFIX
+              routeOptionName: $ROUTE_OPTION_NAME
+              useRandomPathPrefix: true"
+          done
 
           cat <<EOF > rendered-manifest.yaml
           apiVersion: argoproj.io/v1alpha1
@@ -72,15 +79,12 @@ jobs:
                       - name: https
                         namespace: gloo-system
                     rules:
-                      - backendRefName: $BACKEND_REF_NAME
-                        pathPrefix: $PATH_PREFIX
-                        routeOptionName: $ROUTE_OPTION_NAME
-                        useRandomPathPrefix: true
+                      $RULES
             syncPolicy:
               automated:
                 prune: true
                 selfHeal: true
-          EOF
+          EOF          
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
