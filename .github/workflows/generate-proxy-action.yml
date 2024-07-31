@@ -20,7 +20,7 @@ jobs:
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
-          name: ezai-route
+          name: ezai-route-1
           namespace: argocd
           finalizers:
             - resources-finalizer.argocd.argoproj.io
