@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-route-1
+  name: ezai-route-ezai-route-87ad57
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -19,7 +19,7 @@ spec:
         metadata:
           name: ezai-https
           labels:
-            example: ezai-route
+            example: ezai-route-ezai-route-87ad57
         spec:
           hostnames:
             - "ezai.kapoozi.com"
