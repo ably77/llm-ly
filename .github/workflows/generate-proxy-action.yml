@@ -114,14 +114,11 @@ jobs:
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
 
-      - name: Update kustomization.yaml
-        run: |
-          KUSTOMIZATION_PATH="environments/kapoozi/ai-gateway-routes/base/kustomization.yaml"
-          echo "Adding $FILE_PATH to $KUSTOMIZATION_PATH"
-          if ! grep -q "resources:" $KUSTOMIZATION_PATH; then
-            echo "resources:" >> $KUSTOMIZATION_PATH
-          fi
-          echo "- ${FILE_PATH}" >> $KUSTOMIZATION_PATH
+      - name: Add new resource to kustomization.yaml
+      run: |
+        echo "Updating kustomization.yaml"
+        new_resource="ezai-${RANDOM_STRING}.yaml"
+        sed -i "/resources:/a \ \ - ${new_resource}" kustomization.yaml
       
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
