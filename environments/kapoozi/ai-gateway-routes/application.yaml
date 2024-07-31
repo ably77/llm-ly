@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-route-yzK
+  name: ezai-route-zzD
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -19,7 +19,7 @@ spec:
         metadata:
           name: ezai-https
           labels:
-            example: ezai-route-yzK
+            example: ezai-route-zzD
         spec:
           hostnames:
             - "ezai.kapoozi.com"
@@ -27,7 +27,13 @@ spec:
             - name: https
               namespace: gloo-system
           rules:
-            - backendRefName:               pathPrefix: /              routeOptionName:   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+- backendRefName: openai
+  pathPrefix: /openai
+  routeOptionName: openai-route-policies
+- backendRefName: mistral
+  pathPrefix: /mistral
+  routeOptionName: mistral-route-policies
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
