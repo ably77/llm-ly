@@ -1,4 +1,4 @@
-name: Add YAML file
+name: Add YAML file with variable replacement
 
 on:
   workflow_dispatch:
@@ -7,19 +7,40 @@ jobs:
   add_yaml_file:
     runs-on: ubuntu-latest
 
+    env:
+      HOSTNAME: 'ezai.kapoozi.com'
+      NAMESPACE: 'argocd'
+      APP_NAME: 'ezai-route'
+      GATEWAY_NAMESPACE: 'gloo-system'
+      UPSTREAM_REF_OPENAI: 'openai'
+      UPSTREAM_REF_GEMINI: 'gemini'
+      UPSTREAM_REF_CLAUDE: 'claude'
+      UPSTREAM_REF_MISTRAL: 'mistral'
+      ROUTE_OPTION_OPENAI: 'openai-route-policies'
+      ROUTE_OPTION_GEMINI: 'gemini-route-policies'
+      ROUTE_OPTION_CLAUDE: 'claude-route-policies'
+      ROUTE_OPTION_MISTRAL: 'mistral-route-policies'
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Create YAML file
+    - name: Generate random suffix
+      id: suffix
+      run: echo "::set-output name=suffix::$(openssl rand -hex 3)"
+
+    - name: Set full application name
+      run: echo "FULL_APP_NAME=${APP_NAME}-$(openssl rand -hex 3)" >> $GITHUB_ENV
+
+    - name: Create YAML file with placeholders
       run: |
         mkdir -p environments/kapoozi/ai-gateway-routes
         cat <<EOF > environments/kapoozi/ai-gateway-routes/application.yaml
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
-          name: ezai-route-1
-          namespace: argocd
+          name: ${APP_NAME}-${{ env.FULL_APP_NAME }}
+          namespace: ${NAMESPACE}
           finalizers:
             - resources-finalizer.argocd.argoproj.io
         spec:
@@ -36,38 +57,43 @@ jobs:
                 metadata:
                   name: ezai-https
                   labels:
-                    example: ezai-route
+                    example: ${APP_NAME}-${{ env.FULL_APP_NAME }}
                 spec:
                   hostnames:
-                    - "ezai.kapoozi.com"
+                    - "${HOSTNAME}"
                   parentRefs:
                     - name: https
-                      namespace: gloo-system
+                      namespace: ${GATEWAY_NAMESPACE}
                   rules:
-                    - backendRefName: openai
+                    - backendRefName: ${UPSTREAM_REF_OPENAI}
                       pathPrefix: /openai
-                      routeOptionName: openai-route-policies
-                    - backendRefName: gemini
+                      routeOptionName: ${ROUTE_OPTION_OPENAI}
+                    - backendRefName: ${UPSTREAM_REF_GEMINI}
                       pathPrefix: /gemini
-                      routeOptionName: gemini-route-policies
-                    - backendRefName: claude
+                      routeOptionName: ${ROUTE_OPTION_GEMINI}
+                    - backendRefName: ${UPSTREAM_REF_CLAUDE}
                       pathPrefix: /claude
-                      routeOptionName: claude-route-policies
-                    - backendRefName: mistral
+                      routeOptionName: ${ROUTE_OPTION_CLAUDE}
+                    - backendRefName: ${UPSTREAM_REF_MISTRAL}
                       pathPrefix: /mistral
-                      routeOptionName: mistral-route-policies        
+                      routeOptionName: ${ROUTE_OPTION_MISTRAL}        
           syncPolicy:
             automated:
               prune: true
               selfHeal: true
         EOF
 
+    - name: Replace variables in YAML file
+      run: |
+        envsubst < environments/kapoozi/ai-gateway-routes/application.yaml > environments/kapoozi/ai-gateway-routes/application.yaml.tmp
+        mv environments/kapoozi/ai-gateway-routes/application.yaml.tmp environments/kapoozi/ai-gateway-routes/application.yaml
+
     - name: Commit and push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add environments/kapoozi/ai-gateway-routes/application.yaml
-        git commit -m "Add application.yaml file"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        git commit -m "Add application.yaml file with replaced variables"
+        git push https://github-actions:${{ secrets.PAT_TOKEN }}@github.com/ably77/llm-ly.git
