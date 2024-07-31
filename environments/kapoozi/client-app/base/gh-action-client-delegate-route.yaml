@@ -8,7 +8,7 @@ spec:
     - matches:
       - path:
           type: PathPrefix
-          value: /gh-action-client
+          value: /
       backendRefs:
         - name: gh-action-client
           port: 5000
