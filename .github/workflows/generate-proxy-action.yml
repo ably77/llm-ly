@@ -32,6 +32,9 @@ jobs:
       - name: Render manifest based on input
         id: render_manifest
         run: |
+          # Generate a random string for the application name
+          RANDOM_STRING=$(openssl rand -hex 2 | cut -c1-3)
+          
           ROUTES=${{ github.event.inputs.routes }}
           HOSTNAME=${{ github.event.inputs.hostname }}
           USE_RANDOM_PATH_PREFIX=${{ github.event.inputs.use_random_path_prefix }}
@@ -76,11 +79,13 @@ jobs:
             HOSTNAMES=""
           fi
 
-          cat <<EOF > environments/kapoozi/ai-gateway-routes/base/rendered-manifest.yaml
+          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/${RANDOM_STRING}.yaml"
+
+          cat <<EOF > $FILE_PATH
           apiVersion: argoproj.io/v1alpha1
           kind: Application
           metadata:
-            name: random-generated-route
+            name: ${RANDOM_STRING}
             namespace: argocd
             finalizers:
               - resources-finalizer.argocd.argoproj.io
@@ -107,8 +112,10 @@ jobs:
                 selfHeal: true
           EOF
 
+          echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
+
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update rendered manifest
-          file_pattern: environments/kapoozi/ai-gateway-routes/base/rendered-manifest.yaml
+          file_pattern: ${{ env.FILE_PATH }}
