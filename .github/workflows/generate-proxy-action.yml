@@ -37,9 +37,6 @@ jobs:
           USE_RANDOM_PATH_PREFIX=${{ github.event.inputs.use_random_path_prefix }}
           IFS=',' read -ra ROUTE_ARRAY <<< "$ROUTES"
 
-          RANDOM_SUFFIX=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 3 | head -n 1)
-          APP_NAME="ezai-${RANDOM_SUFFIX}"
-
           RULES=""
           for ROUTE_NAME in "${ROUTE_ARRAY[@]}"; do
             case $ROUTE_NAME in
@@ -79,41 +76,39 @@ jobs:
             HOSTNAMES=""
           fi
 
-          FILENAME="${APP_NAME}.yaml"
-
-          cat <<EOF > $FILENAME
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: ${APP_NAME}
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: default
-  destination:
-    namespace: ai-gateway
-    server: "https://kubernetes.default.svc"
-  source:
-    repoURL: 'https://github.com/ably77/llm-ly'
-    targetRevision: HEAD
-    path: llm-route-gen-chart
-    helm:
-      values: |
-        spec:
-          ${HOSTNAMES}
-          parentRefs:
-            - name: https
-              namespace: gloo-system
-          rules:${RULES}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-EOF
+          cat <<EOF > rendered-manifest.yaml
+          apiVersion: argoproj.io/v1alpha1
+          kind: Application
+          metadata:
+            name: random-generated-route
+            namespace: argocd
+            finalizers:
+              - resources-finalizer.argocd.argoproj.io
+          spec:
+            project: default
+            destination:
+              namespace: ai-gateway
+              server: "https://kubernetes.default.svc"
+            source:
+              repoURL: 'https://github.com/ably77/llm-ly'
+              targetRevision: HEAD
+              path: llm-route-gen-chart
+              helm:
+                values: |
+                  spec:
+                    ${HOSTNAMES}
+                    parentRefs:
+                      - name: https
+                        namespace: gloo-system
+                    rules:${RULES}
+            syncPolicy:
+              automated:
+                prune: true
+                selfHeal: true
+          EOF
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update ${APP_NAME} manifest
-          file_pattern: '*.yaml'
+          commit_message: Update rendered manifest
+          file_pattern: rendered-manifest.yaml
