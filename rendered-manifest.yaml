@@ -21,10 +21,10 @@ spec:
             - name: https
               namespace: gloo-system
           rules:
-- backendRefName: gemini
-  pathPrefix: /gemini
-  routeOptionName: gemini-route-policies
-  useRandomPathPrefix: true
+            - backendRefName: gemini
+              pathPrefix: /gemini
+              routeOptionName: gemini-route-policies
+              useRandomPathPrefix: true
   syncPolicy:
     automated:
       prune: true
