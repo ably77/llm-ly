@@ -17,8 +17,7 @@ spec:
     helm:
       values: |
         spec:
-          hostnames:
-          - "foo.com"
+          
           parentRefs:
             - name: https
               namespace: gloo-system
@@ -26,19 +25,19 @@ spec:
           - backendRefName: openai
             pathPrefix: /openai
             routeOptionName: openai-route-policies
-            useRandomPathPrefix: false
+            useRandomPathPrefix: true
           - backendRefName: gemini
             pathPrefix: /gemini
             routeOptionName: gemini-route-policies
-            useRandomPathPrefix: false
+            useRandomPathPrefix: true
           - backendRefName: claude
             pathPrefix: /claude
             routeOptionName: claude-route-policies
-            useRandomPathPrefix: false
+            useRandomPathPrefix: true
           - backendRefName: mistral
             pathPrefix: /mistral
             routeOptionName: mistral-route-policies
-            useRandomPathPrefix: false
+            useRandomPathPrefix: true
   syncPolicy:
     automated:
       prune: true
