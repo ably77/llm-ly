@@ -79,13 +79,13 @@ jobs:
             HOSTNAMES=""
           fi
 
-          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/${RANDOM_STRING}.yaml"
+          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/ezai-${RANDOM_STRING}.yaml"
 
           cat <<EOF > $FILE_PATH
           apiVersion: argoproj.io/v1alpha1
           kind: Application
           metadata:
-            name: ${RANDOM_STRING}
+            name: ezai-${RANDOM_STRING}
             namespace: argocd
             finalizers:
               - resources-finalizer.argocd.argoproj.io
