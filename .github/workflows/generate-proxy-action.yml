@@ -3,16 +3,11 @@ name: Add YAML file with variable replacement
 on:
   workflow_dispatch:
     inputs:
-      upstream_option:
-        description: 'Choose an upstream option'
+      upstream_options:
+        description: 'Choose one or more upstream options (comma separated)'
         required: true
         default: 'openai'
-        type: choice
-        options:
-          - openai
-          - gemini
-          - claude
-          - mistral
+        type: string
 
 jobs:
   add_yaml_file:
@@ -68,40 +63,43 @@ jobs:
                     - name: https
                       namespace: ${GATEWAY_NAMESPACE}
                   rules:
-                    - backendRefName: \${{ env.UPSTREAM_REF }}
-                      pathPrefix: /\${{ env.UPSTREAM_REF }}
-                      routeOptionName: \${{ env.ROUTE_OPTION }}
-          syncPolicy:
-            automated:
-              prune: true
-              selfHeal: true
         EOF
 
     - name: Set selected upstream variables
       run: |
-        case ${{ github.event.inputs.upstream_option }} in
-          "openai")
-            echo "UPSTREAM_REF=openai" >> $GITHUB_ENV
-            echo "ROUTE_OPTION=openai-route-policies" >> $GITHUB_ENV
-            ;;
-          "gemini")
-            echo "UPSTREAM_REF=gemini" >> $GITHUB_ENV
-            echo "ROUTE_OPTION=gemini-route-policies" >> $GITHUB_ENV
-            ;;
-          "claude")
-            echo "UPSTREAM_REF=claude" >> $GITHUB_ENV
-            echo "ROUTE_OPTION=claude-route-policies" >> $GITHUB_ENV
-            ;;
-          "mistral")
-            echo "UPSTREAM_REF=mistral" >> $GITHUB_ENV
-            echo "ROUTE_OPTION=mistral-route-policies" >> $GITHUB_ENV
-            ;;
-        esac
+        IFS=',' read -ra ADDR <<< "${{ github.event.inputs.upstream_options }}"
+        for i in "${ADDR[@]}"; do
+          case $i in
+            "openai")
+              echo "- backendRefName: openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  pathPrefix: /openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  routeOptionName: openai-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              ;;
+            "gemini")
+              echo "- backendRefName: gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  pathPrefix: /gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  routeOptionName: gemini-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              ;;
+            "claude")
+              echo "- backendRefName: claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  pathPrefix: /claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  routeOptionName: claude-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              ;;
+            "mistral")
+              echo "- backendRefName: mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  pathPrefix: /mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "  routeOptionName: mistral-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              ;;
+          esac
+        done
 
-    - name: Replace variables in YAML file
+    - name: Append rules to YAML file
       run: |
-        envsubst < environments/kapoozi/ai-gateway-routes/application.yaml > environments/kapoozi/ai-gateway-routes/application.yaml.tmp
-        mv environments/kapoozi/ai-gateway-routes/application.yaml.tmp environments/kapoozi/ai-gateway-routes/application.yaml
+        cat environments/kapoozi/ai-gateway-routes/rules.txt >> environments/kapoozi/ai-gateway-routes/application.yaml
+        echo "          syncPolicy:" >> environments/kapoozi/ai-gateway-routes/application.yaml
+        echo "            automated:" >> environments/kapoozi/ai-gateway-routes/application.yaml
+        echo "              prune: true" >> environments/kapoozi/ai-gateway-routes/application.yaml
+        echo "              selfHeal: true" >> environments/kapoozi/ai-gateway-routes/application.yaml
 
     - name: Commit and push changes
       env:
