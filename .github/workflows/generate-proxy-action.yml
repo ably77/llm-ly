@@ -39,7 +39,7 @@ jobs:
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
-          name: ${APP_NAME}-${{ env.FULL_APP_NAME }}
+          name: ${{ env.FULL_APP_NAME }}
           namespace: ${NAMESPACE}
           finalizers:
             - resources-finalizer.argocd.argoproj.io
