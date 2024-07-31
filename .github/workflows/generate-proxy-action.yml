@@ -8,6 +8,10 @@ on:
         required: true
         default: 'openai,gemini,claude,mistral'
         type: string
+      hostname:
+        description: 'Hostname (optional)'
+        required: false
+        type: string
 
 jobs:
   update-manifest:
@@ -21,6 +25,7 @@ jobs:
         id: render_manifest
         run: |
           ROUTES=${{ github.event.inputs.routes }}
+          HOSTNAME=${{ github.event.inputs.hostname }}
           IFS=',' read -ra ROUTE_ARRAY <<< "$ROUTES"
 
           RULES=""
@@ -49,11 +54,18 @@ jobs:
             esac
 
             RULES="${RULES}
-                    - backendRefName: $BACKEND_REF_NAME
-                      pathPrefix: $PATH_PREFIX
-                      routeOptionName: $ROUTE_OPTION_NAME
-                      useRandomPathPrefix: true"
+            - backendRefName: $BACKEND_REF_NAME
+              pathPrefix: $PATH_PREFIX
+              routeOptionName: $ROUTE_OPTION_NAME
+              useRandomPathPrefix: true"
           done
+
+          if [ -n "$HOSTNAME" ]; then
+            HOSTNAMES="hostnames:
+            - \"$HOSTNAME\""
+          else
+            HOSTNAMES=""
+          fi
 
           cat <<EOF > rendered-manifest.yaml
           apiVersion: argoproj.io/v1alpha1
@@ -75,6 +87,7 @@ jobs:
               helm:
                 values: |
                   spec:
+                    ${HOSTNAMES}
                     parentRefs:
                       - name: https
                         namespace: gloo-system
