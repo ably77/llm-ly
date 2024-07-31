@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-route-58V
+  name: ezai-route-niR
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -19,11 +19,9 @@ spec:
         metadata:
           name: ezai-https
           labels:
-            example: ezai-route-58V
+            example: ezai-route-niR
         spec:
-          hostnames:
-            - """"
-          parentRefs:
+                  parentRefs:
             - name: https
               namespace: gloo-system
           rules:
@@ -38,8 +36,8 @@ spec:
               routeOptionName: claude-route-policies
             - backendRefName: mistral
               pathPrefix: /mistral
-              routeOptionName: mistral-route-policies        
-  syncPolicy:
+              routeOptionName: mistral-route-policies
+          syncPolicy:
     automated:
       prune: true
       selfHeal: true
