@@ -5,8 +5,6 @@
 {{- $namespace := .Release.Namespace }}
 {{- $hostname := printf "%s.kapoozi.com" $name }}
 {{- $hostnames := .Values.spec.hostnames | default (list $hostname) }}
-{{- $strippedName := (print $name | regexReplaceAll "^ezai-" "") }}
-{{- $nameSuffix := (ternary $strippedName (substr $strippedName 0 (min (len $strippedName) 3))) }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -28,7 +26,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
-    {{- $namePath := printf "/%s/%s" $nameSuffix .backendRefName }}
+    {{- $namePath := printf "/%s/%s" $name .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
