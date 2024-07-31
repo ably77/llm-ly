@@ -117,5 +117,5 @@ jobs:
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update rendered manifest
+          commit_message: Configured ezai-${RANDOM_STRING}.yaml manifest
           file_pattern: ${{ env.FILE_PATH }}
