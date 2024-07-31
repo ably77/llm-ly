@@ -6,7 +6,7 @@
 {{- $hostnames := .Values.spec.hostnames | default (list $generatedHostname) }}
 {{- $nameLength := len $name }}
 {{- $suffixStart := sub $nameLength 3 }}
-{{- $suffix := substr $name $suffixStart 3 }}
+{{- $suffix := substr (printf "%s" $name) $suffixStart 3 }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
