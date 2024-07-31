@@ -13,14 +13,14 @@ on:
         required: false
         default: 'ezai.kapoozi.com'
         type: string
-      use_random_path_prefix:
-        description: 'Use random path prefix (true/false)'
-        required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+      random_path_prefix:
+        description: 'Actual random path prefix to use'
+        required: true
+        type: string
+      route_id:
+        description: 'Route ID in the database'
+        required: true
+        type: string
 
 jobs:
   update-manifest:
@@ -32,13 +32,11 @@ jobs:
 
       - name: Render manifest based on input
         id: render_manifest
-        run: |
-          # Generate a random string for the application name
-          RANDOM_STRING=$(openssl rand -hex 2 | cut -c1-4)
-          
+        run: |  
+          ROUTE_ID=${{ github.event.inputs.route_id }}
+          RANDOM_PATH_PREFIX=${{ github.event.inputs.random_path_prefix }}
           ROUTES=${{ github.event.inputs.routes }}
           HOSTNAME=${{ github.event.inputs.hostname }}
-          USE_RANDOM_PATH_PREFIX=${{ github.event.inputs.use_random_path_prefix }}
           IFS=',' read -ra ROUTE_ARRAY <<< "$ROUTES"
 
           RULES=""
@@ -70,7 +68,6 @@ jobs:
                     - backendRefName: $BACKEND_REF_NAME
                       pathPrefix: $PATH_PREFIX
                       routeOptionName: $ROUTE_OPTION_NAME
-                      useRandomPathPrefix: $USE_RANDOM_PATH_PREFIX"
           done
 
           if [ -n "$HOSTNAME" ]; then
@@ -80,7 +77,7 @@ jobs:
             HOSTNAMES=""
           fi
 
-          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/ezai-${RANDOM_STRING}.yaml"
+          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/ezai-${RANDOM_PATH_PREFIX}.yaml"
 
           cat <<EOF > $FILE_PATH
           apiVersion: argoproj.io/v1alpha1
@@ -102,9 +99,9 @@ jobs:
               helm:
                 values: |
                   metadata:
-                    name: "ezai-${RANDOM_STRING}"
+                    name: "ezai-${RANDOM_PATH_PREFIX}"
                     labels:
-                      prefixPath: "${RANDOM_STRING}"
+                      prefixPath: "${RANDOM_PATH_PREFIX}"
                   spec:
                     ${HOSTNAMES}
                     parentRefs:
@@ -125,3 +122,4 @@ jobs:
           commit_message: Configured new llm proxy using github action
           file_pattern: |
             ${{ env.FILE_PATH }}
+      # TODO: This is where the last step would come in where you call the webhook and send the ROUTE_ID + status 
