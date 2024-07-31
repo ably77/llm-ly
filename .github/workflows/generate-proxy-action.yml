@@ -3,12 +3,10 @@ name: Add YAML file with variable replacement
 on:
   workflow_dispatch:
     inputs:
-      hostname:
-        description: 'Hostname'
-        required: false
-      backend:
-        description: 'Select Backend'
+      upstream_option:
+        description: 'Choose an upstream option'
         required: true
+        default: 'openai'
         type: choice
         options:
           - openai
@@ -21,7 +19,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      HOSTNAME: 'ezai.kapoozi.com'
       NAMESPACE: 'argocd'
+      APP_NAME: 'ezai-route'
       GATEWAY_NAMESPACE: 'gloo-system'
 
     steps:
@@ -33,85 +33,75 @@ jobs:
       run: echo "::set-output name=suffix::$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)"
 
     - name: Set full application name
-      run: echo "FULL_APP_NAME=${{ github.event.inputs.app_name }}-${{ steps.suffix.outputs.suffix }}" >> $GITHUB_ENV
+      run: echo "FULL_APP_NAME=${APP_NAME}-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)" >> $GITHUB_ENV
 
     - name: Create YAML file with placeholders
       run: |
         mkdir -p environments/kapoozi/ai-gateway-routes
         cat <<EOF > environments/kapoozi/ai-gateway-routes/application.yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: ${{ env.FULL_APP_NAME }}
-  namespace: ${{ env.NAMESPACE }}
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: default
-  destination:
-    namespace: ai-gateway
-    server: "https://kubernetes.default.svc"
-  source:
-    repoURL: 'https://github.com/ably77/llm-ly'
-    targetRevision: HEAD
-    path: llm-route-gen-chart
-    helm:
-      values: |
+        apiVersion: argoproj.io/v1alpha1
+        kind: Application
         metadata:
-          name: ezai-https
-          labels:
-            example: ${{ env.FULL_APP_NAME }}
+          name: ${{ env.FULL_APP_NAME }}
+          namespace: ${NAMESPACE}
+          finalizers:
+            - resources-finalizer.argocd.argoproj.io
         spec:
+          project: default
+          destination:
+            namespace: ai-gateway
+            server: "https://kubernetes.default.svc"
+          source:
+            repoURL: 'https://github.com/ably77/llm-ly'
+            targetRevision: HEAD
+            path: llm-route-gen-chart
+            helm:
+              values: |
+                metadata:
+                  name: ezai-https
+                  labels:
+                    example: ${{ env.FULL_APP_NAME }}
+                spec:
+                  hostnames:
+                    - "${HOSTNAME}"
+                  parentRefs:
+                    - name: https
+                      namespace: ${GATEWAY_NAMESPACE}
+                  rules:
+                    - backendRefName: \${{ env.UPSTREAM_REF }}
+                      pathPrefix: /\${{ env.UPSTREAM_REF }}
+                      routeOptionName: \${{ env.ROUTE_OPTION }}
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
+        EOF
 
-        if [ -n "${{ github.event.inputs.hostname }}" ]; then
-          echo "          hostnames:
-            - \"${{ github.event.inputs.hostname }}\"" >> environments/kapoozi/ai-gateway-routes/application.yaml
-        fi
-
-        case "${{ github.event.inputs.backend }}" in
+    - name: Set selected upstream variables
+      run: |
+        case ${{ github.event.inputs.upstream_option }} in
           "openai")
-            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
-          rules:
-            - backendRefName: openai
-              pathPrefix: /openai
-              routeOptionName: openai-route-policies
-EOF
+            echo "UPSTREAM_REF=openai" >> $GITHUB_ENV
+            echo "ROUTE_OPTION=openai-route-policies" >> $GITHUB_ENV
             ;;
           "gemini")
-            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
-          rules:
-            - backendRefName: gemini
-              pathPrefix: /gemini
-              routeOptionName: gemini-route-policies
-EOF
+            echo "UPSTREAM_REF=gemini" >> $GITHUB_ENV
+            echo "ROUTE_OPTION=gemini-route-policies" >> $GITHUB_ENV
             ;;
           "claude")
-            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
-          rules:
-            - backendRefName: claude
-              pathPrefix: /claude
-              routeOptionName: claude-route-policies
-EOF
+            echo "UPSTREAM_REF=claude" >> $GITHUB_ENV
+            echo "ROUTE_OPTION=claude-route-policies" >> $GITHUB_ENV
             ;;
           "mistral")
-            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
-          rules:
-            - backendRefName: mistral
-              pathPrefix: /mistral
-              routeOptionName: mistral-route-policies
-EOF
+            echo "UPSTREAM_REF=mistral" >> $GITHUB_ENV
+            echo "ROUTE_OPTION=mistral-route-policies" >> $GITHUB_ENV
             ;;
         esac
 
-        cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
-          parentRefs:
-            - name: https
-              namespace: ${{ env.GATEWAY_NAMESPACE }}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-EOF
+    - name: Replace variables in YAML file
+      run: |
+        envsubst < environments/kapoozi/ai-gateway-routes/application.yaml > environments/kapoozi/ai-gateway-routes/application.yaml.tmp
+        mv environments/kapoozi/ai-gateway-routes/application.yaml.tmp environments/kapoozi/ai-gateway-routes/application.yaml
 
     - name: Commit and push changes
       env:
