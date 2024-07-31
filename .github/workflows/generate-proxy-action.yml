@@ -113,17 +113,20 @@ jobs:
           EOF
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
+          echo "RANDOM_STRING=$RANDOM_STRING" >> $GITHUB_ENV
 
       - name: Add new resource to kustomization.yaml
-      run: |
-        echo "Updating kustomization.yaml"
-        new_resource="ezai-${RANDOM_STRING}.yaml"
-        sed -i "/resources:/a \ \ - ${new_resource}" kustomization.yaml
-      
+        run: |
+          echo "Updating kustomization.yaml"
+          new_resource="ezai-${RANDOM_STRING}.yaml"
+          sed -i "/resources:/a \ \ - ${new_resource}" environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
+        env:
+          RANDOM_STRING: ${{ env.RANDOM_STRING }}
+
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Configured new llm proxy using github action
+          commit_message: Configured new llm proxy using GitHub action
           file_pattern: |
             ${{ env.FILE_PATH }}
             environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
