@@ -35,7 +35,7 @@ spec:
       matches:
         - path:
             type: PathPrefix
-            value: {{ if .useRandomPathPrefix }}{{ $namePath }}{{ else }}{{ .pathPrefix }}{{ end }}
+            value: {{ if .useRandomPathPrefix }}{{ $namePath }}{{ else }}{{ .pathPrefix | default (printf "/%s" $name) }}{{ end }}
       filters:
         - type: ExtensionRef
           extensionRef:
