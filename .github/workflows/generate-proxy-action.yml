@@ -65,56 +65,59 @@ jobs:
     - name: Create YAML file with placeholders
       run: |
         mkdir -p environments/kapoozi/ai-gateway-routes
-        echo "apiVersion: argoproj.io/v1alpha1
-        kind: Application
+        cat <<EOF > environments/kapoozi/ai-gateway-routes/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${{ env.FULL_APP_NAME }}
+  namespace: ${{ env.NAMESPACE }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: ai-gateway
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: 'https://github.com/ably77/llm-ly'
+    targetRevision: HEAD
+    path: llm-route-gen-chart
+    helm:
+      values: |
         metadata:
-          name: ${{ env.FULL_APP_NAME }}
-          namespace: ${{ env.NAMESPACE }}
-          finalizers:
-            - resources-finalizer.argocd.argoproj.io
+          name: ezai-https
+          labels:
+            example: ${{ env.FULL_APP_NAME }}
         spec:
-          project: default
-          destination:
-            namespace: ai-gateway
-            server: \"https://kubernetes.default.svc\"
-          source:
-            repoURL: 'https://github.com/ably77/llm-ly'
-            targetRevision: HEAD
-            path: llm-route-gen-chart
-            helm:
-              values: |
-                metadata:
-                  name: ezai-https
-                  labels:
-                    example: ${{ env.FULL_APP_NAME }}
-                spec:" > environments/kapoozi/ai-gateway-routes/application.yaml
+EOF
 
         if [ -n "${{ github.event.inputs.hostname }}" ]; then
-          echo "                  hostnames:
-                    - \"${{ github.event.inputs.hostname }}\"" >> environments/kapoozi/ai-gateway-routes/application.yaml
+          echo "          hostnames:
+            - \"${{ github.event.inputs.hostname }}\"" >> environments/kapoozi/ai-gateway-routes/application.yaml
         fi
 
-        echo "                  parentRefs:
-                    - name: https
-                      namespace: ${{ env.GATEWAY_NAMESPACE }}
-                  rules:
-                    - backendRefName: ${{ github.event.inputs.upstream_ref_openai }}
-                      pathPrefix: /openai
-                      routeOptionName: ${{ github.event.inputs.route_option_openai }}
-                    - backendRefName: ${{ github.event.inputs.upstream_ref_gemini }}
-                      pathPrefix: /gemini
-                      routeOptionName: ${{ github.event.inputs.route_option_gemini }}
-                    - backendRefName: ${{ github.event.inputs.upstream_ref_claude }}
-                      pathPrefix: /claude
-                      routeOptionName: ${{ github.event.inputs.route_option_claude }}
-                    - backendRefName: ${{ github.event.inputs.upstream_ref_mistral }}
-                      pathPrefix: /mistral
-                      routeOptionName: ${{ github.event.inputs.route_option_mistral }}" >> environments/kapoozi/ai-gateway-routes/application.yaml
-
-        echo "          syncPolicy:
-            automated:
-              prune: true
-              selfHeal: true" >> environments/kapoozi/ai-gateway-routes/application.yaml
+        cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+          parentRefs:
+            - name: https
+              namespace: ${{ env.GATEWAY_NAMESPACE }}
+          rules:
+            - backendRefName: ${{ github.event.inputs.upstream_ref_openai }}
+              pathPrefix: /openai
+              routeOptionName: ${{ github.event.inputs.route_option_openai }}
+            - backendRefName: ${{ github.event.inputs.upstream_ref_gemini }}
+              pathPrefix: /gemini
+              routeOptionName: ${{ github.event.inputs.route_option_gemini }}
+            - backendRefName: ${{ github.event.inputs.upstream_ref_claude }}
+              pathPrefix: /claude
+              routeOptionName: ${{ github.event.inputs.route_option_claude }}
+            - backendRefName: ${{ github.event.inputs.upstream_ref_mistral }}
+              pathPrefix: /mistral
+              routeOptionName: ${{ github.event.inputs.route_option_mistral }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
 
     - name: Commit and push changes
       env:
