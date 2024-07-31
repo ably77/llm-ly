@@ -125,4 +125,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Configured new llm proxy using github action
-          file_pattern: ${{ env.FILE_PATH }}
+          file_pattern: |
+            ${{ env.FILE_PATH }}
+            environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
