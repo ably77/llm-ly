@@ -44,7 +44,7 @@ spec:
           - name: OPENAI_ENDPOINT
             value: "https://ezai.kapoozi.com/openai"
           - name: ANTHROPIC_ENDPOINT
-            value: "https://ai-gateway.kapoozi.com/claude"
+            value: "https://ezai.kapoozi.com/claude"
           # used with gloo api-key extauth policy to demonstrate api-key masking
           - name: MANAGED_CLAUDE_API_KEY
             value: "solo.io"
