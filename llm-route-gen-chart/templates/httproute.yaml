@@ -6,7 +6,7 @@
 {{- $hostname := printf "%s.kapoozi.com" $name }}
 {{- $hostnames := .Values.spec.hostnames | default (list $hostname) }}
 {{- $strippedName := (print $name | regexReplaceAll "^ezai-" "") }}
-{{- $nameSuffix := (substr $strippedName (sub (len $strippedName) 3) 3) }}
+{{- $nameSuffix := (ternary $strippedName (substr $strippedName 0 (min (len $strippedName) 3))) }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
