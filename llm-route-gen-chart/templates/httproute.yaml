@@ -5,6 +5,7 @@
 {{- $namespace := .Release.Namespace }}
 {{- $hostname := printf "%s.kapoozi.com" $name }}
 {{- $hostnames := .Values.spec.hostnames | default (list $hostname) }}
+{{- $prefixPath := index .Values.metadata.labels "prefixPath" | default $name }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -26,7 +27,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
-    {{- $namePath := printf "/%s/%s" $name .backendRefName }}
+    {{- $namePath := printf "/%s/%s" $prefixPath .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
