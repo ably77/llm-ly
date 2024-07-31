@@ -27,7 +27,10 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
-    {{- $namePath := printf "/%s/%s" $strippedName .backendRefName }}
+    {{- $pathPrefix := printf "/%s" $strippedName }}
+    {{- $pathPrefix := trimSuffix "/" $pathPrefix }}
+    {{- $namePath := printf "%s/%s" $pathPrefix .backendRefName }}
+    {{- $namePath := regexReplaceAll "/+" "/" $namePath }} 
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
