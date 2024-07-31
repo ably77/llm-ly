@@ -78,13 +78,12 @@ jobs:
                     parentRefs:
                       - name: https
                         namespace: gloo-system
-                    rules:
-                      $RULES
+                    rules:${RULES}
             syncPolicy:
               automated:
                 prune: true
                 selfHeal: true
-          EOF          
+          EOF
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
