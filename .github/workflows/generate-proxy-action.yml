@@ -12,6 +12,14 @@ on:
         description: 'Hostname (optional)'
         required: false
         type: string
+      use_random_path_prefix:
+        description: 'Use random path prefix (true/false)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
 
 jobs:
   update-manifest:
@@ -26,6 +34,7 @@ jobs:
         run: |
           ROUTES=${{ github.event.inputs.routes }}
           HOSTNAME=${{ github.event.inputs.hostname }}
+          USE_RANDOM_PATH_PREFIX=${{ github.event.inputs.use_random_path_prefix }}
           IFS=',' read -ra ROUTE_ARRAY <<< "$ROUTES"
 
           RULES=""
@@ -57,7 +66,7 @@ jobs:
                     - backendRefName: $BACKEND_REF_NAME
                       pathPrefix: $PATH_PREFIX
                       routeOptionName: $ROUTE_OPTION_NAME
-                      useRandomPathPrefix: true"
+                      useRandomPathPrefix: $USE_RANDOM_PATH_PREFIX"
           done
 
           if [ -n "$HOSTNAME" ]; then
