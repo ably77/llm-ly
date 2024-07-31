@@ -70,6 +70,6 @@ spec:
                   "routes": "openai,gemini,claude,mistral",
                   "hostname": "ezai.kapoozi.com",
                   "random_path_prefix": "ABCD",
-                  "route_id": "ezai-ABCD"
+                  "route_id": "ezai-1"
                 }
               }
