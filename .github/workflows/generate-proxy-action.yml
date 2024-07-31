@@ -113,30 +113,17 @@ jobs:
           EOF
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
-          echo "RANDOM_STRING=$RANDOM_STRING" >> $GITHUB_ENV
-          echo "Generated manifest file at $FILE_PATH"
-
-      - name: Debug: List files in base directory
-        run: ls -l environments/kapoozi/ai-gateway-routes/base/
-
-      - name: Debug: Show content of kustomization.yaml before update
-        run: cat environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
 
       - name: Add new resource to kustomization.yaml
-        run: |
-          echo "Updating kustomization.yaml"
-          new_resource="ezai-${RANDOM_STRING}.yaml"
-          sed -i "/resources:/a \ \ - ${new_resource}" environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
-        env:
-          RANDOM_STRING: ${{ env.RANDOM_STRING }}
-
-      - name: Debug: Show content of kustomization.yaml after update
-        run: cat environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
-
+      run: |
+        echo "Updating kustomization.yaml"
+        new_resource="ezai-${RANDOM_STRING}.yaml"
+        sed -i "/resources:/a \ \ - ${new_resource}" environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
+      
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Configured new llm proxy using GitHub action
+          commit_message: Configured new llm proxy using github action
           file_pattern: |
             ${{ env.FILE_PATH }}
             environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
