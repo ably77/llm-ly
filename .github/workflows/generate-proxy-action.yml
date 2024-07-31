@@ -83,7 +83,7 @@ jobs:
           apiVersion: argoproj.io/v1alpha1
           kind: Application
           metadata:
-            name: ezai-${RANDOM_STRING}
+            name: ezai-${RANDOM_PATH_PREFIX}
             namespace: argocd
             finalizers:
               - resources-finalizer.argocd.argoproj.io
