@@ -21,7 +21,6 @@ spec:
             - name: https
               namespace: gloo-system
           rules:
-            
   - backendRefName: openai
     pathPrefix: /openai
     routeOptionName: openai-route-policies
@@ -42,4 +41,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-EOF          
