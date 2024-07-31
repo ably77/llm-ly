@@ -3,7 +3,8 @@
 {{- $generatedHostname := printf "%s.kapoozi.com" $baseName }}
 {{- $name := .Values.metadata.name | default $generatedName }}
 {{- $namespace := .Release.Namespace }}
-{{- $hostnames := .Values.spec.hostnames | default (list $generatedHostname) }}
+{{- $hostname := printf "%s.kapoozi.com" $name }}
+{{- $hostnames := .Values.spec.hostnames | default (list $hostname) }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
