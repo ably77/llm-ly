@@ -62,7 +62,6 @@ spec:
           labels:
             example: ${{ env.FULL_APP_NAME }}
         spec:
-EOF
 
         if [ -n "${{ github.event.inputs.hostname }}" ]; then
           echo "          hostnames:
