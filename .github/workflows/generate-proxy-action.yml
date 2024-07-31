@@ -114,6 +114,13 @@ jobs:
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
 
+      - name: Update kustomization.yaml
+        run: |
+          KUSTOMIZATION_PATH="environments/kapoozi/ai-gateway-routes/base/kustomization.yaml"
+          echo "Adding $FILE_PATH to $KUSTOMIZATION_PATH"
+          echo "resources:" > $KUSTOMIZATION_PATH
+          echo "- ${FILE_PATH}" >> $KUSTOMIZATION_PATH
+      
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
