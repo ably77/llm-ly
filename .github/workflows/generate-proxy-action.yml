@@ -114,8 +114,17 @@ jobs:
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
 
+      - name: Update kustomization.yaml
+        run: |
+          KUSTOMIZATION_PATH="environments/kapoozi/ai-gateway-routes/base/kustomization.yaml"
+          echo "Adding $FILE_PATH to $KUSTOMIZATION_PATH"
+          echo "resources:" > $KUSTOMIZATION_PATH
+          echo "- ${FILE_PATH}" >> $KUSTOMIZATION_PATH
+
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Configured new llm proxy using github action
-          file_pattern: ${{ env.FILE_PATH }}
+          commit_message: Update rendered manifest and kustomization
+          file_pattern: |
+            environments/kapoozi/ai-gateway-routes/base/rendered-manifest-*.yaml
+            environments/kapoozi/ai-gateway-routes/base/kustomization.yaml
