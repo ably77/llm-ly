@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gh-action-client
+  namespace: client
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gh-action-client
+  namespace: client
+  labels:
+    app: gh-action-client
+spec:
+  ports:
+  - port: 5000
+    name: http
+  selector:
+    name: gh-action-client
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-action-client-deployment
+  namespace: client
+  labels:
+    app: gh-action-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: gh-action-client
+  template:
+    metadata:
+      labels:
+        name: gh-action-client
+    spec:
+      serviceAccountName: gh-action-client
+      containers:
+      - name: gh-action-client
+        image: ably77/curl-ui:0.7.3
+        ports:
+        - containerPort: 5000
+        env:
+          - name: CURL_UI_TITLE
+            value: "Github Action Client"
+          - name: REQUEST_URL
+            value: "https://api.github.com/repos/ably77/llm-ly/actions/workflows/generate-proxy-action.yml/dispatches"
+          - name: BASE_PATH
+            value: "/invoke"
+          - name: ENABLE_JSON_CONTENT_TYPE
+            value: "true"
+          - name: DEFAULT_HTTP_METHOD
+            value: "POST"
+          - name: HEADER_1_KEY
+            value: "Accept"
+          - name: HEADER_1_VALUE
+            value: "application/vnd.github.v3+json"
+          - name: HEADER_2_KEY
+            value: "Authorization"
+          - name: HEADER_2_VALUE
+            value: "token <insert-your-token>"
