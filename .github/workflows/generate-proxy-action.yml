@@ -33,7 +33,7 @@ jobs:
         id: render_manifest
         run: |
           # Generate a random string for the application name
-          RANDOM_STRING=$(openssl rand -hex 2 | cut -c1-3)
+          RANDOM_STRING=$(openssl rand -hex 2 | cut -c1-4)
           
           ROUTES=${{ github.event.inputs.routes }}
           HOSTNAME=${{ github.event.inputs.hostname }}
