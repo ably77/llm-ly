@@ -68,7 +68,7 @@ spec:
                 "ref": "main",
                 "inputs": {
                   "routes": "openai,gemini,claude,mistral",
-                  "hostname": "ezai.kapoozi.com", # optional, if omitted, a random hostname will be generated
+                  "hostname": "ezai.kapoozi.com",
                   "use_random_path_prefix": "false"
                 }
               }
