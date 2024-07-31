@@ -38,7 +38,7 @@ spec:
       serviceAccountName: gh-action-client
       containers:
       - name: gh-action-client
-        image: ably77/curl-ui:0.7.3
+        image: ably77/curl-ui:0.7.4
         ports:
         - containerPort: 5000
         env:
