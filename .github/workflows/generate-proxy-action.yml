@@ -49,41 +49,41 @@ jobs:
             esac
 
             RULES="${RULES}
-            - backendRefName: $BACKEND_REF_NAME
-              pathPrefix: $PATH_PREFIX
-              routeOptionName: $ROUTE_OPTION_NAME
-              useRandomPathPrefix: true"
+          - backendRefName: $BACKEND_REF_NAME
+            pathPrefix: $PATH_PREFIX
+            routeOptionName: $ROUTE_OPTION_NAME
+            useRandomPathPrefix: true"
           done
 
           cat <<EOF > rendered-manifest.yaml
-          apiVersion: argoproj.io/v1alpha1
-          kind: Application
-          metadata:
-            name: random-generated-route
-            namespace: argocd
-            finalizers:
-              - resources-finalizer.argocd.argoproj.io
-          spec:
-            project: default
-            destination:
-              namespace: ai-gateway
-              server: "https://kubernetes.default.svc"
-            source:
-              repoURL: 'https://github.com/ably77/llm-ly'
-              targetRevision: HEAD
-              path: llm-route-gen-chart
-              helm:
-                values: |
-                  spec:
-                    parentRefs:
-                      - name: https
-                        namespace: gloo-system
-                    rules:${RULES}
-            syncPolicy:
-              automated:
-                prune: true
-                selfHeal: true
-          EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: random-generated-route
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: ai-gateway
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: 'https://github.com/ably77/llm-ly'
+    targetRevision: HEAD
+    path: llm-route-gen-chart
+    helm:
+      values: |
+        spec:
+          parentRefs:
+            - name: https
+              namespace: gloo-system
+          rules:${RULES}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
