@@ -3,45 +3,15 @@ name: Add YAML file with variable replacement
 on:
   workflow_dispatch:
     inputs:
-      hostname:
-        description: 'Hostname'
-        required: false
-      app_name:
-        description: 'Application Name'
-        required: false
-        default: 'ezai-route'
-      upstream_ref_openai:
-        description: 'Upstream Ref OpenAI'
-        required: false
-        default: 'openai'
-      upstream_ref_gemini:
-        description: 'Upstream Ref Gemini'
-        required: false
-        default: 'gemini'
-      upstream_ref_claude:
-        description: 'Upstream Ref Claude'
-        required: false
-        default: 'claude'
-      upstream_ref_mistral:
-        description: 'Upstream Ref Mistral'
-        required: false
-        default: 'mistral'
-      route_option_openai:
-        description: 'Route Option OpenAI'
-        required: false
-        default: 'openai-route-policies'
-      route_option_gemini:
-        description: 'Route Option Gemini'
-        required: false
-        default: 'gemini-route-policies'
-      route_option_claude:
-        description: 'Route Option Claude'
-        required: false
-        default: 'claude-route-policies'
-      route_option_mistral:
-        description: 'Route Option Mistral'
-        required: false
-        default: 'mistral-route-policies'
+      backend:
+        description: 'Select Backend'
+        required: true
+        type: choice
+        options:
+          - openai
+          - gemini
+          - claude
+          - mistral
 
 jobs:
   add_yaml_file:
@@ -60,7 +30,7 @@ jobs:
       run: echo "::set-output name=suffix::$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)"
 
     - name: Set full application name
-      run: echo "FULL_APP_NAME=${{ github.event.inputs.app_name }}-${{ steps.suffix.outputs.suffix }}" >> $GITHUB_ENV
+      run: echo "FULL_APP_NAME=ezai-route-${{ steps.suffix.outputs.suffix }}" >> $GITHUB_ENV
 
     - name: Create YAML file with placeholders
       run: |
@@ -96,23 +66,37 @@ EOF
             - \"${{ github.event.inputs.hostname }}\"" >> environments/kapoozi/ai-gateway-routes/application.yaml
         fi
 
+        case "${{ github.event.inputs.backend }}" in
+          "openai")
+            echo "          rules:
+            - backendRefName: openai
+              pathPrefix: /openai
+              routeOptionName: openai-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+            ;;
+          "gemini")
+            echo "          rules:
+            - backendRefName: gemini
+              pathPrefix: /gemini
+              routeOptionName: gemini-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+            ;;
+          "claude")
+            echo "          rules:
+            - backendRefName: claude
+              pathPrefix: /claude
+              routeOptionName: claude-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+            ;;
+          "mistral")
+            echo "          rules:
+            - backendRefName: mistral
+              pathPrefix: /mistral
+              routeOptionName: mistral-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+            ;;
+        esac
+
         cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
           parentRefs:
             - name: https
               namespace: ${{ env.GATEWAY_NAMESPACE }}
-          rules:
-            - backendRefName: ${{ github.event.inputs.upstream_ref_openai }}
-              pathPrefix: /openai
-              routeOptionName: ${{ github.event.inputs.route_option_openai }}
-            - backendRefName: ${{ github.event.inputs.upstream_ref_gemini }}
-              pathPrefix: /gemini
-              routeOptionName: ${{ github.event.inputs.route_option_gemini }}
-            - backendRefName: ${{ github.event.inputs.upstream_ref_claude }}
-              pathPrefix: /claude
-              routeOptionName: ${{ github.event.inputs.route_option_claude }}
-            - backendRefName: ${{ github.event.inputs.upstream_ref_mistral }}
-              pathPrefix: /mistral
-              routeOptionName: ${{ github.event.inputs.route_option_mistral }}
   syncPolicy:
     automated:
       prune: true
