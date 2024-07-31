@@ -17,26 +17,28 @@ spec:
     helm:
       values: |
         spec:
+          hostnames:
+  - "ezaiz.kapoozi.com"
           parentRefs:
             - name: https
               namespace: gloo-system
           rules:
-          - backendRefName: openai
-            pathPrefix: /openai
-            routeOptionName: openai-route-policies
-            useRandomPathPrefix: true
-          - backendRefName: gemini
-            pathPrefix: /gemini
-            routeOptionName: gemini-route-policies
-            useRandomPathPrefix: true
-          - backendRefName: claude
-            pathPrefix: /claude
-            routeOptionName: claude-route-policies
-            useRandomPathPrefix: true
-          - backendRefName: mistral
-            pathPrefix: /mistral
-            routeOptionName: mistral-route-policies
-            useRandomPathPrefix: true
+  - backendRefName: openai
+    pathPrefix: /openai
+    routeOptionName: openai-route-policies
+    useRandomPathPrefix: true
+  - backendRefName: gemini
+    pathPrefix: /gemini
+    routeOptionName: gemini-route-policies
+    useRandomPathPrefix: true
+  - backendRefName: claude
+    pathPrefix: /claude
+    routeOptionName: claude-route-policies
+    useRandomPathPrefix: true
+  - backendRefName: mistral
+    pathPrefix: /mistral
+    routeOptionName: mistral-route-policies
+    useRandomPathPrefix: true
   syncPolicy:
     automated:
       prune: true
