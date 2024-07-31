@@ -26,6 +26,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
+    {{- $prefixPath := .Values.metadata.labels.prefixPath }}
     {{- $namePath := printf "/%s/%s" $name .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
@@ -34,7 +35,7 @@ spec:
       matches:
         - path:
             type: PathPrefix
-            value: {{ if .useRandomPathPrefix }}{{ $namePath }}{{ else }}{{ .pathPrefix }}{{ end }}
+            value: {{ if .useRandomPathPrefix }}{{ $prefixPath }}{{ else }}{{ .pathPrefix }}{{ end }}
       filters:
         - type: ExtensionRef
           extensionRef:
