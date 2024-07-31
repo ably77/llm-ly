@@ -111,4 +111,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update rendered manifest
-          file_pattern: rendered-manifest.yaml
+          file_pattern: environments/kapoozi/ai-gateway-routes/rendered-manifest.yaml
