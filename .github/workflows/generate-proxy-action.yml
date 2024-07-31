@@ -34,36 +34,36 @@ jobs:
       run: |
         mkdir -p environments/kapoozi/ai-gateway-routes
         cat <<EOF > environments/kapoozi/ai-gateway-routes/application.yaml
-        apiVersion: argoproj.io/v1alpha1
-        kind: Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${{ env.FULL_APP_NAME }}
+  namespace: ${NAMESPACE}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: ai-gateway
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: 'https://github.com/ably77/llm-ly'
+    targetRevision: HEAD
+    path: llm-route-gen-chart
+    helm:
+      values: |
         metadata:
-          name: ${{ env.FULL_APP_NAME }}
-          namespace: ${NAMESPACE}
-          finalizers:
-            - resources-finalizer.argocd.argoproj.io
+          name: ezai-https
+          labels:
+            example: ${{ env.FULL_APP_NAME }}
         spec:
-          project: default
-          destination:
-            namespace: ai-gateway
-            server: "https://kubernetes.default.svc"
-          source:
-            repoURL: 'https://github.com/ably77/llm-ly'
-            targetRevision: HEAD
-            path: llm-route-gen-chart
-            helm:
-              values: |
-                metadata:
-                  name: ezai-https
-                  labels:
-                    example: ${{ env.FULL_APP_NAME }}
-                spec:
-                  hostnames:
-                    - "${HOSTNAME}"
-                  parentRefs:
-                    - name: https
-                      namespace: ${GATEWAY_NAMESPACE}
-                  rules:
-        EOF
+          hostnames:
+            - "${HOSTNAME}"
+          parentRefs:
+            - name: https
+              namespace: ${GATEWAY_NAMESPACE}
+          rules:
+EOF
 
     - name: Set selected upstream variables
       run: |
@@ -71,35 +71,37 @@ jobs:
         for i in "${ADDR[@]}"; do
           case $i in
             "openai")
-              echo "                    - backendRefName: openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      pathPrefix: /openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      routeOptionName: openai-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "            - backendRefName: openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              pathPrefix: /openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              routeOptionName: openai-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
               ;;
             "gemini")
-              echo "                    - backendRefName: gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      pathPrefix: /gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      routeOptionName: gemini-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "            - backendRefName: gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              pathPrefix: /gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              routeOptionName: gemini-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
               ;;
             "claude")
-              echo "                    - backendRefName: claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      pathPrefix: /claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      routeOptionName: claude-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "            - backendRefName: claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              pathPrefix: /claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              routeOptionName: claude-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
               ;;
             "mistral")
-              echo "                    - backendRefName: mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      pathPrefix: /mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "                      routeOptionName: mistral-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "            - backendRefName: mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              pathPrefix: /mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
+              echo "              routeOptionName: mistral-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
               ;;
           esac
         done
 
-    - name: Append rules to YAML file
+    - name: Append rules and syncPolicy to YAML file
       run: |
         cat environments/kapoozi/ai-gateway-routes/rules.txt >> environments/kapoozi/ai-gateway-routes/application.yaml
-        echo "          syncPolicy:" >> environments/kapoozi/ai-gateway-routes/application.yaml
-        echo "            automated:" >> environments/kapoozi/ai-gateway-routes/application.yaml
-        echo "              prune: true" >> environments/kapoozi/ai-gateway-routes/application.yaml
-        echo "              selfHeal: true" >> environments/kapoozi/ai-gateway-routes/application.yaml
+        cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
 
     - name: Commit and push changes
       env:
