@@ -76,7 +76,7 @@ jobs:
             HOSTNAMES=""
           fi
 
-          cat <<EOF > environments/kapoozi/ai-gateway-routes/rendered-manifest.yaml
+          cat <<EOF > environments/kapoozi/ai-gateway-routes/base/rendered-manifest.yaml
           apiVersion: argoproj.io/v1alpha1
           kind: Application
           metadata:
@@ -111,4 +111,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update rendered manifest
-          file_pattern: environments/kapoozi/ai-gateway-routes/rendered-manifest.yaml
+          file_pattern: environments/kapoozi/ai-gateway-routes/base/rendered-manifest.yaml
