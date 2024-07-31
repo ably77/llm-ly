@@ -60,3 +60,5 @@ spec:
             value: "Authorization"
           - name: HEADER_2_VALUE
             value: "token <insert-your-token>"
+          - name: REQUEST_BODY
+            value: '{"ref":"main"}'
