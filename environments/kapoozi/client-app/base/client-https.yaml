@@ -19,7 +19,7 @@ spec:
       matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /invoke
           #headers:
           #  - name: "x-access-code"
           #    value: "chatbot"
