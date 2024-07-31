@@ -68,6 +68,7 @@ jobs:
                     - backendRefName: $BACKEND_REF_NAME
                       pathPrefix: $PATH_PREFIX
                       routeOptionName: $ROUTE_OPTION_NAME"
+                      useRandomPathPrefix: true
           done
 
           if [ -n "$HOSTNAME" ]; then
