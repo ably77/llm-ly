@@ -6,18 +6,10 @@ on:
       hostname:
         description: 'Hostname'
         required: false
-      namespace:
-        description: 'Namespace'
-        required: false
-        default: 'argocd'
       app_name:
         description: 'Application Name'
         required: false
         default: 'ezai-route'
-      gateway_namespace:
-        description: 'Gateway Namespace'
-        required: false
-        default: 'gloo-system'
       upstream_ref_openai:
         description: 'Upstream Ref OpenAI'
         required: false
@@ -55,6 +47,10 @@ jobs:
   add_yaml_file:
     runs-on: ubuntu-latest
 
+    env:
+      NAMESPACE: 'argocd'
+      GATEWAY_NAMESPACE: 'gloo-system'
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -74,7 +70,7 @@ jobs:
         kind: Application
         metadata:
           name: ${{ env.FULL_APP_NAME }}
-          namespace: ${{ github.event.inputs.namespace }}
+          namespace: ${{ env.NAMESPACE }}
           finalizers:
             - resources-finalizer.argocd.argoproj.io
         spec:
@@ -97,7 +93,7 @@ jobs:
                     - "${{ github.event.inputs.hostname }}"
                   parentRefs:
                     - name: https
-                      namespace: ${{ github.event.inputs.gateway_namespace }}
+                      namespace: ${{ env.GATEWAY_NAMESPACE }}
                   rules:
                     - backendRefName: ${{ github.event.inputs.upstream_ref_openai }}
                       pathPrefix: /openai
@@ -116,6 +112,11 @@ jobs:
               prune: true
               selfHeal: true
         EOF
+
+    - name: Replace variables in YAML file
+      run: |
+        envsubst < environments/kapoozi/ai-gateway-routes/application.yaml > environments/kapoozi/ai-gateway-routes/application.yaml.tmp
+        mv environments/kapoozi/ai-gateway-routes/application.yaml.tmp environments/kapoozi/ai-gateway-routes/application.yaml
 
     - name: Commit and push changes
       env:
