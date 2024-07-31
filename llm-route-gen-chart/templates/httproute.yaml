@@ -4,6 +4,7 @@
 {{- $name := .Values.metadata.name | default $generatedName }}
 {{- $namespace := .Release.Namespace }}
 {{- $hostnames := .Values.spec.hostnames | default (list $generatedHostname) }}
+{{- $suffix := substr $name -3 }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -25,7 +26,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
-    {{- $randomPath := printf "/%s/%s" $baseName .backendRefName }}
+    {{- $randomPath := printf "/%s/%s" $suffix .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
