@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-route-A7D
+  name: ezai-route-58V
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -19,10 +19,10 @@ spec:
         metadata:
           name: ezai-https
           labels:
-            example: ezai-route-A7D
+            example: ezai-route-58V
         spec:
           hostnames:
-            - "null"
+            - """"
           parentRefs:
             - name: https
               namespace: gloo-system
