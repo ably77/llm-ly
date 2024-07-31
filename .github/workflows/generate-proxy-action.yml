@@ -82,35 +82,35 @@ jobs:
           FILENAME="${APP_NAME}.yaml"
 
           cat <<EOF > $FILENAME
-          apiVersion: argoproj.io/v1alpha1
-          kind: Application
-          metadata:
-            name: ${APP_NAME}
-            namespace: argocd
-            finalizers:
-              - resources-finalizer.argocd.argoproj.io
-          spec:
-            project: default
-            destination:
-              namespace: ai-gateway
-              server: "https://kubernetes.default.svc"
-            source:
-              repoURL: 'https://github.com/ably77/llm-ly'
-              targetRevision: HEAD
-              path: llm-route-gen-chart
-              helm:
-                values: |
-                  spec:
-                    ${HOSTNAMES}
-                    parentRefs:
-                      - name: https
-                        namespace: gloo-system
-                    rules:${RULES}
-            syncPolicy:
-              automated:
-                prune: true
-                selfHeal: true
-          EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${APP_NAME}
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: ai-gateway
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: 'https://github.com/ably77/llm-ly'
+    targetRevision: HEAD
+    path: llm-route-gen-chart
+    helm:
+      values: |
+        spec:
+          ${HOSTNAMES}
+          parentRefs:
+            - name: https
+              namespace: gloo-system
+          rules:${RULES}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
