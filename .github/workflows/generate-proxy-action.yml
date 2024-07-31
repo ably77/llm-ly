@@ -27,10 +27,10 @@ jobs:
 
     - name: Generate random suffix
       id: suffix
-      run: echo "::set-output name=suffix::$(openssl rand -hex 3)"
+      run: echo "::set-output name=suffix::$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)"
 
     - name: Set full application name
-      run: echo "FULL_APP_NAME=${APP_NAME}-$(openssl rand -hex 3)" >> $GITHUB_ENV
+      run: echo "FULL_APP_NAME=${APP_NAME}-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)" >> $GITHUB_ENV
 
     - name: Create YAML file with placeholders
       run: |
@@ -57,7 +57,7 @@ jobs:
                 metadata:
                   name: ezai-https
                   labels:
-                    example: ${APP_NAME}-${{ env.FULL_APP_NAME }}
+                    example: ${{ env.FULL_APP_NAME }}
                 spec:
                   hostnames:
                     - "${HOSTNAME}"
