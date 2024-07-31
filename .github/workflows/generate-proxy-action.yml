@@ -65,8 +65,7 @@ jobs:
     - name: Create YAML file with placeholders
       run: |
         mkdir -p environments/kapoozi/ai-gateway-routes
-        cat <<EOF > environments/kapoozi/ai-gateway-routes/application.yaml
-        apiVersion: argoproj.io/v1alpha1
+        echo "apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
           name: ${{ env.FULL_APP_NAME }}
@@ -77,7 +76,7 @@ jobs:
           project: default
           destination:
             namespace: ai-gateway
-            server: "https://kubernetes.default.svc"
+            server: \"https://kubernetes.default.svc\"
           source:
             repoURL: 'https://github.com/ably77/llm-ly'
             targetRevision: HEAD
@@ -88,10 +87,14 @@ jobs:
                   name: ezai-https
                   labels:
                     example: ${{ env.FULL_APP_NAME }}
-                spec:
-                  hostnames:
-                    - "${{ github.event.inputs.hostname }}"
-                  parentRefs:
+                spec:" > environments/kapoozi/ai-gateway-routes/application.yaml
+
+        if [ -n "${{ github.event.inputs.hostname }}" ]; then
+          echo "                  hostnames:
+                    - \"${{ github.event.inputs.hostname }}\"" >> environments/kapoozi/ai-gateway-routes/application.yaml
+        fi
+
+        echo "                  parentRefs:
                     - name: https
                       namespace: ${{ env.GATEWAY_NAMESPACE }}
                   rules:
@@ -106,17 +109,12 @@ jobs:
                       routeOptionName: ${{ github.event.inputs.route_option_claude }}
                     - backendRefName: ${{ github.event.inputs.upstream_ref_mistral }}
                       pathPrefix: /mistral
-                      routeOptionName: ${{ github.event.inputs.route_option_mistral }}        
-          syncPolicy:
+                      routeOptionName: ${{ github.event.inputs.route_option_mistral }}" >> environments/kapoozi/ai-gateway-routes/application.yaml
+
+        echo "          syncPolicy:
             automated:
               prune: true
-              selfHeal: true
-        EOF
-
-    - name: Replace variables in YAML file
-      run: |
-        envsubst < environments/kapoozi/ai-gateway-routes/application.yaml > environments/kapoozi/ai-gateway-routes/application.yaml.tmp
-        mv environments/kapoozi/ai-gateway-routes/application.yaml.tmp environments/kapoozi/ai-gateway-routes/application.yaml
+              selfHeal: true" >> environments/kapoozi/ai-gateway-routes/application.yaml
 
     - name: Commit and push changes
       env:
