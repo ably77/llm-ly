@@ -76,7 +76,7 @@ jobs:
             HOSTNAMES=""
           fi
 
-          cat <<EOF > rendered-manifest.yaml
+          cat <<EOF > environments/kapoozi/ai-gateway-routes/rendered-manifest.yaml
           apiVersion: argoproj.io/v1alpha1
           kind: Application
           metadata:
