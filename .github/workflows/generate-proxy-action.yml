@@ -9,13 +9,14 @@ on:
         default: 'openai,gemini,claude,mistral'
         type: string
       hostname:
-        description: 'Hostname (optional)'
+        description: 'Hostname (optional, leave empty for random host at ezai-*.kapoozi.com)'
         required: false
+        default: 'ezai.kapoozi.com'
         type: string
       use_random_path_prefix:
         description: 'Use random path prefix (true/false)'
         required: false
-        default: 'false'
+        default: 'true'
         type: choice
         options:
           - true
