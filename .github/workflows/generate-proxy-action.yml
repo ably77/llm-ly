@@ -2,11 +2,6 @@ name: Add YAML file
 
 on:
   workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'debug'
 
 jobs:
   add_yaml_file:
