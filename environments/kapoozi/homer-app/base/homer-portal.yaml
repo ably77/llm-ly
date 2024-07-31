@@ -177,6 +177,12 @@ spec:
                         keywords: "argocd"
                         url: "https://argocd.kapoozi.com/argo"
                         target: "_blank" # optional html a tag target attribute
+                      - name: "Github Actions Dashboard"
+                        icon: "fab fa-git-alt"
+                        tag: "github"
+                        keywords: "github"
+                        url: "https://github.com/ably77/llm-ly/actions"
+                        target: "_blank" # optional html a tag target attribute
 
                   - name: "AI Gateway Workloads"
                     icon: "fas fa-brain"
