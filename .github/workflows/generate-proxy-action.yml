@@ -1,44 +1,59 @@
-name: Add YAML file with variable replacement
+name: Configure Application Manifest
 
 on:
   workflow_dispatch:
     inputs:
-      upstream_options:
-        description: 'Choose one or more upstream options (comma separated)'
+      route:
+        description: 'Select the route option'
         required: true
-        default: 'openai'
-        type: string
+        type: choice
+        options:
+          - openai
+          - gemini
+          - claude
+          - mistral
 
 jobs:
-  add_yaml_file:
+  update-manifest:
     runs-on: ubuntu-latest
 
-    env:
-      HOSTNAME: 'ezai.kapoozi.com'
-      NAMESPACE: 'argocd'
-      APP_NAME: 'ezai-route'
-      GATEWAY_NAMESPACE: 'gloo-system'
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Generate random suffix
-      id: suffix
-      run: echo "::set-output name=suffix::$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)"
+      - name: Render manifest based on input
+        id: render_manifest
+        run: |
+          ROUTE_NAME=${{ github.event.inputs.route }}
+          case $ROUTE_NAME in
+            "openai")
+              BACKEND_REF_NAME="openai"
+              PATH_PREFIX="/openai"
+              ROUTE_OPTION_NAME="openai-route-policies"
+              ;;
+            "gemini")
+              BACKEND_REF_NAME="gemini"
+              PATH_PREFIX="/gemini"
+              ROUTE_OPTION_NAME="gemini-route-policies"
+              ;;
+            "claude")
+              BACKEND_REF_NAME="claude"
+              PATH_PREFIX="/claude"
+              ROUTE_OPTION_NAME="claude-route-policies"
+              ;;
+            "mistral")
+              BACKEND_REF_NAME="mistral"
+              PATH_PREFIX="/mistral"
+              ROUTE_OPTION_NAME="mistral-route-policies"
+              ;;
+          esac
 
-    - name: Set full application name
-      run: echo "FULL_APP_NAME=${APP_NAME}-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)" >> $GITHUB_ENV
-
-    - name: Create YAML file with placeholders
-      run: |
-        mkdir -p environments/kapoozi/ai-gateway-routes
-        cat <<EOF > environments/kapoozi/ai-gateway-routes/application.yaml
+          cat <<EOF > rendered-manifest.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${{ env.FULL_APP_NAME }}
-  namespace: ${NAMESPACE}
+  name: random-generated-route
+  namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -52,63 +67,23 @@ spec:
     path: llm-route-gen-chart
     helm:
       values: |
-        metadata:
-          name: ezai-https
-          labels:
-            example: ${{ env.FULL_APP_NAME }}
         spec:
-          hostnames:
-            - "${HOSTNAME}"
           parentRefs:
             - name: https
-              namespace: ${GATEWAY_NAMESPACE}
+              namespace: gloo-system
           rules:
-EOF
-
-    - name: Set selected upstream variables
-      run: |
-        IFS=',' read -ra ADDR <<< "${{ github.event.inputs.upstream_options }}"
-        for i in "${ADDR[@]}"; do
-          case $i in
-            "openai")
-              echo "            - backendRefName: openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              pathPrefix: /openai" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              routeOptionName: openai-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              ;;
-            "gemini")
-              echo "            - backendRefName: gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              pathPrefix: /gemini" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              routeOptionName: gemini-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              ;;
-            "claude")
-              echo "            - backendRefName: claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              pathPrefix: /claude" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              routeOptionName: claude-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              ;;
-            "mistral")
-              echo "            - backendRefName: mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              pathPrefix: /mistral" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              echo "              routeOptionName: mistral-route-policies" >> environments/kapoozi/ai-gateway-routes/rules.txt
-              ;;
-          esac
-        done
-
-    - name: Append rules and syncPolicy to YAML file
-      run: |
-        cat environments/kapoozi/ai-gateway-routes/rules.txt >> environments/kapoozi/ai-gateway-routes/application.yaml
-        cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+            - backendRefName: $BACKEND_REF_NAME
+              pathPrefix: $PATH_PREFIX
+              routeOptionName: $ROUTE_OPTION_NAME
+              useRandomPathPrefix: true
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
 EOF
 
-    - name: Commit and push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add environments/kapoozi/ai-gateway-routes/application.yaml
-        git commit -m "Add application.yaml file with replaced variables"
-        git push https://github-actions:${{ secrets.PAT_TOKEN }}@github.com/ably77/llm-ly.git
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update rendered manifest
+          file_pattern: rendered-manifest.yaml
