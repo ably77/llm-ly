@@ -3,6 +3,9 @@ name: Add YAML file with variable replacement
 on:
   workflow_dispatch:
     inputs:
+      hostname:
+        description: 'Hostname'
+        required: false
       backend:
         description: 'Select Backend'
         required: true
@@ -30,7 +33,7 @@ jobs:
       run: echo "::set-output name=suffix::$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 3)"
 
     - name: Set full application name
-      run: echo "FULL_APP_NAME=ezai-route-${{ steps.suffix.outputs.suffix }}" >> $GITHUB_ENV
+      run: echo "FULL_APP_NAME=${{ github.event.inputs.app_name }}-${{ steps.suffix.outputs.suffix }}" >> $GITHUB_ENV
 
     - name: Create YAML file with placeholders
       run: |
@@ -68,28 +71,36 @@ EOF
 
         case "${{ github.event.inputs.backend }}" in
           "openai")
-            echo "          rules:
+            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+          rules:
             - backendRefName: openai
               pathPrefix: /openai
-              routeOptionName: openai-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+              routeOptionName: openai-route-policies
+EOF
             ;;
           "gemini")
-            echo "          rules:
+            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+          rules:
             - backendRefName: gemini
               pathPrefix: /gemini
-              routeOptionName: gemini-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+              routeOptionName: gemini-route-policies
+EOF
             ;;
           "claude")
-            echo "          rules:
+            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+          rules:
             - backendRefName: claude
               pathPrefix: /claude
-              routeOptionName: claude-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+              routeOptionName: claude-route-policies
+EOF
             ;;
           "mistral")
-            echo "          rules:
+            cat <<EOF >> environments/kapoozi/ai-gateway-routes/application.yaml
+          rules:
             - backendRefName: mistral
               pathPrefix: /mistral
-              routeOptionName: mistral-route-policies" >> environments/kapoozi/ai-gateway-routes/application.yaml
+              routeOptionName: mistral-route-policies
+EOF
             ;;
         esac
 
