@@ -44,6 +44,8 @@ spec:
         env:
           - name: CURL_UI_TITLE
             value: "Github Action Client"
+          - name: "LOGO_IMAGE_URL"
+            value: "https://github.com/ably77/llm-ly/blob/main/images/github-action.png?raw=true"
           - name: REQUEST_URL
             value: "https://api.github.com/repos/ably77/llm-ly/actions/workflows/generate-proxy-action.yml/dispatches"
           - name: BASE_PATH
