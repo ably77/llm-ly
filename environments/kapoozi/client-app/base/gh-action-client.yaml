@@ -62,10 +62,10 @@ spec:
             value: "token replace-with-valid-token"
           - name: REQUEST_BODY
             value: |
-              '{
+              {
                 "ref": "main",
                 "inputs": {
                   "routes": "openai,gemini,claude,mistral",
                   "use_random_path_prefix": "false"
                 }
-              }'
+              }
