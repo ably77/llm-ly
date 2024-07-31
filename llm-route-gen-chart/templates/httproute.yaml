@@ -2,6 +2,7 @@
 {{- $generatedName := printf "ezai-%s" $baseName }}
 {{- $generatedHostname := printf "%s.kapoozi.com" $baseName }}
 {{- $name := .Values.metadata.name | default $generatedName }}
+{{- $strippedName := (print $name | regexReplaceAll "^ezai-" "") }}
 {{- $namespace := .Release.Namespace }}
 {{- $hostname := printf "%s.kapoozi.com" $name }}
 {{- $hostnames := .Values.spec.hostnames | default (list $hostname) }}
@@ -26,7 +27,7 @@ spec:
 {{- end }}
   rules:
 {{- range .Values.spec.rules }}
-    {{- $namePath := printf "/%s/%s" $name .backendRefName }}
+    {{- $namePath := printf "/%s/%s" $strippedName .backendRefName }}
     - backendRefs:
         - group: gloo.solo.io
           kind: Upstream
