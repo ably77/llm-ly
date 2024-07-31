@@ -18,7 +18,7 @@ spec:
       values: |
         spec:
           hostnames:
-          - "ezaif-foo.com"
+          - "foo.com"
           parentRefs:
             - name: https
               namespace: gloo-system
@@ -26,19 +26,19 @@ spec:
           - backendRefName: openai
             pathPrefix: /openai
             routeOptionName: openai-route-policies
-            useRandomPathPrefix: true
+            useRandomPathPrefix: false
           - backendRefName: gemini
             pathPrefix: /gemini
             routeOptionName: gemini-route-policies
-            useRandomPathPrefix: true
+            useRandomPathPrefix: false
           - backendRefName: claude
             pathPrefix: /claude
             routeOptionName: claude-route-policies
-            useRandomPathPrefix: true
+            useRandomPathPrefix: false
           - backendRefName: mistral
             pathPrefix: /mistral
             routeOptionName: mistral-route-policies
-            useRandomPathPrefix: true
+            useRandomPathPrefix: false
   syncPolicy:
     automated:
       prune: true
