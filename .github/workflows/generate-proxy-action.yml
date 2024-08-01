@@ -78,13 +78,13 @@ jobs:
             HOSTNAMES=""
           fi
 
-          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/ezai-${RANDOM_PATH_PREFIX}.yaml"
+          FILE_PATH="environments/kapoozi/ai-gateway-routes/base/ezai-${ROUTE_ID}.yaml"
 
           cat <<EOF > $FILE_PATH
           apiVersion: argoproj.io/v1alpha1
           kind: Application
           metadata:
-            name: ezai-${RANDOM_PATH_PREFIX}
+            name: ezai-${ROUTE_ID}
             namespace: argocd
             finalizers:
               - resources-finalizer.argocd.argoproj.io
@@ -100,7 +100,7 @@ jobs:
               helm:
                 values: |
                   metadata:
-                    name: "ezai-${RANDOM_PATH_PREFIX}"
+                    name: "ezai-${ROUTE_ID}"
                     labels:
                       prefixPath: "${RANDOM_PATH_PREFIX}"
                   spec:
