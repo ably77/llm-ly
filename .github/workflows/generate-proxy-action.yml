@@ -136,5 +136,5 @@ jobs:
             {
               "status": "success",
               "action": "create",
-              "message": "Created proxy with route_id ${{ github.event.inputs.route_id }}",
+              "message": "Created proxy with route_id ${{ github.event.inputs.route_id }}"
             }
