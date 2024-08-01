@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       suffix:
-        description: 'ID of the application name to delete'
+        description: 'Suffix of the application name to delete'
         required: true
         type: string
 
@@ -27,6 +27,7 @@ jobs:
             exit 1
           else
             git rm "$FILE_PATH"
+            echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
             echo "Deleted $FILE_PATH"
           fi
 
@@ -35,4 +36,4 @@ jobs:
         with:
           commit_message: "Deleted llm proxy manifest with suffix ${SUFFIX} using GitHub Action"
           file_pattern: |
-            environments/kapoozi/ai-gateway-routes/base/*${{ github.event.inputs.suffix }}.yaml
+            ${{ env.FILE_PATH }}
