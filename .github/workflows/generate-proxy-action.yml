@@ -128,13 +128,6 @@ jobs:
           file_pattern: |
             ${{ env.FILE_PATH }}
       - name: Send webhook notification
-        if: ${{ github.event.inputs.webhook_url != '' }}
-        uses: distributhor/workflow-webhook@v3
-        with:
-          webhook_url: ${{ github.event.inputs.webhook_url }}
-          data: |
-            {
-              "status": "success",
-              "action": "create",
-              "message": "Created proxy with route_id ${{ github.event.inputs.route_id }}"
-            }
+        run: |
+          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{GitHub.event.inputs.webhook_url }}
+
