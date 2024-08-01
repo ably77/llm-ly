@@ -21,6 +21,10 @@ on:
         description: 'Route ID in the database'
         required: true
         type: string
+      webhook_url:
+        description: 'Webhook URL to call on completion'
+        required: true
+        type: string
 
 jobs:
   update-manifest:
@@ -123,4 +127,19 @@ jobs:
           commit_message: Configured new llm proxy using github action
           file_pattern: |
             ${{ env.FILE_PATH }}
-      # TODO: This is where the last step would come in where you call the webhook and send the ROUTE_ID + status 
+      - name: Send webhook notification
+        if: ${{ github.event.inputs.webhook_url != '' }}
+        uses: distributhor/workflow-webhook@v1
+        with:
+          url: ${{ github.event.inputs.webhook_url }}
+          method: PUT
+          headers: |
+            Content-Type: application/json
+          body: |
+            {
+              "status": "success",
+              "action": "create",
+              "message": "Created proxy with route_id ${{ github.event.inputs.route_id }}",
+              "repository": "${{ github.repository }}",
+              "commit_sha": "${{ github.sha }}"
+            }
