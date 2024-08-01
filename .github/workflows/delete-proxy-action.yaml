@@ -46,12 +46,13 @@ jobs:
         uses: distributhor/workflow-webhook@v1
         with:
           url: ${{ github.event.inputs.webhook_url }}
-          method: POST
+          method: PUT
           headers: |
             Content-Type: application/json
           body: |
             {
               "status": "success",
+              "action": "delete",
               "message": "Deleted proxy with route_id ${{ github.event.inputs.route_id }}",
               "repository": "${{ github.repository }}",
               "commit_sha": "${{ github.sha }}"
