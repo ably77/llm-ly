@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ezai-26
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ai-gateway-routes
+  destination:
+    namespace: ai-gateway
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: 'https://github.com/ably77/llm-ly'
+    targetRevision: HEAD
+    path: llm-route-gen-chart
+    helm:
+      values: |
+        metadata:
+          name: "ezai-26"
+          labels:
+            prefixPath: "0uz8"
+        spec:
+          hostnames:
+          - "ezai.kapoozi.com"
+          parentRefs:
+            - name: https
+              namespace: gloo-system
+          rules:
+          - backendRefName: mistral
+            pathPrefix: /mistral
+            routeOptionName: mistral-route-policies
+            useRandomPathPrefix: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
