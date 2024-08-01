@@ -129,17 +129,12 @@ jobs:
             ${{ env.FILE_PATH }}
       - name: Send webhook notification
         if: ${{ github.event.inputs.webhook_url != '' }}
-        uses: distributhor/workflow-webhook@v1
+        uses: distributhor/workflow-webhook@v3
         with:
-          url: ${{ github.event.inputs.webhook_url }}
-          method: PUT
-          headers: |
-            Content-Type: application/json
-          body: |
+          webhook_url: ${{ github.event.inputs.webhook_url }}
+          data: |
             {
               "status": "success",
               "action": "create",
               "message": "Created proxy with route_id ${{ github.event.inputs.route_id }}",
-              "repository": "${{ github.repository }}",
-              "commit_sha": "${{ github.sha }}"
             }
