@@ -1,0 +1,38 @@
+name: Delete Proxy Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      suffix:
+        description: 'ID of the application name to delete'
+        required: true
+        type: string
+
+jobs:
+  delete-manifest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Find and delete manifest file
+        id: find_and_delete_manifest
+        run: |  
+          SUFFIX=${{ github.event.inputs.suffix }}
+          FILE_PATH=$(find environments/kapoozi/ai-gateway-routes/base/ -name "*${SUFFIX}.yaml")
+
+          if [ -z "$FILE_PATH" ]; then
+            echo "No file found with suffix $SUFFIX"
+            exit 1
+          else
+            git rm "$FILE_PATH"
+            echo "Deleted $FILE_PATH"
+          fi
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Deleted llm proxy manifest with suffix ${SUFFIX} using GitHub Action"
+          file_pattern: |
+            environments/kapoozi/ai-gateway-routes/base/*${{ github.event.inputs.suffix }}.yaml
