@@ -11,7 +11,7 @@ data:
   
   
   # Set app resync to a shorter value (default 180s)
-  timeout.reconciliation: 60s
+  timeout.reconciliation: 20s
 
   resource.customizations: |
     argoproj.io/Application:
