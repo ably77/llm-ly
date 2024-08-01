@@ -27,13 +27,12 @@ jobs:
             exit 1
           else
             git rm "$FILE_PATH"
-            echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
             echo "Deleted $FILE_PATH"
           fi
 
       - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Deleted llm proxy manifest with suffix ${SUFFIX} using GitHub Action"
-          file_pattern: |
-            ${{ env.FILE_PATH }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Deleted llm proxy manifest with suffix ${{ github.event.inputs.suffix }} using GitHub Action"
+          git push origin HEAD
