@@ -3,8 +3,8 @@ name: Delete Proxy Action
 on:
   workflow_dispatch:
     inputs:
-      suffix:
-        description: 'Suffix of the application name to delete'
+      route_id:
+        description: 'Route ID to delete'
         required: true
         type: string
       webhook_url:
@@ -23,11 +23,11 @@ jobs:
       - name: Find and delete manifest file
         id: find_and_delete_manifest
         run: |  
-          SUFFIX=${{ github.event.inputs.suffix }}
-          FILE_PATH=$(find environments/kapoozi/ai-gateway-routes/base/ -name "*${SUFFIX}.yaml")
+          ROUTE_ID=${{ github.event.inputs.route_id }}
+          FILE_PATH=$(find environments/kapoozi/ai-gateway-routes/base/ -name "*${ROUTE_ID}.yaml")
 
           if [ -z "$FILE_PATH" ]; then
-            echo "No file found with suffix $SUFFIX"
+            echo "No file found with route_id $ROUTE_ID"
             exit 1
           else
             git rm "$FILE_PATH"
@@ -38,7 +38,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Deleted llm proxy manifest with suffix ${{ github.event.inputs.suffix }} using GitHub Action"
+          git commit -m "Deleted llm proxy manifest with route_id ${{ github.event.inputs.route_id }} using GitHub Action"
           git push origin HEAD
 
       - name: Send webhook notification
@@ -52,7 +52,7 @@ jobs:
           body: |
             {
               "status": "success",
-              "message": "Deleted proxy with suffix ${{ github.event.inputs.suffix }}",
+              "message": "Deleted proxy with route_id ${{ github.event.inputs.route_id }}",
               "repository": "${{ github.repository }}",
               "commit_sha": "${{ github.sha }}"
             }
