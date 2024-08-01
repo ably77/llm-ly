@@ -7,6 +7,10 @@ on:
         description: 'Suffix of the application name to delete'
         required: true
         type: string
+      webhook_url:
+        description: 'Webhook URL to call on completion'
+        required: false
+        type: string
 
 jobs:
   delete-manifest:
@@ -36,3 +40,19 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Deleted llm proxy manifest with suffix ${{ github.event.inputs.suffix }} using GitHub Action"
           git push origin HEAD
+
+      - name: Send webhook notification
+        if: ${{ github.event.inputs.webhook_url != '' }}
+        uses: distributhor/workflow-webhook@v1
+        with:
+          url: ${{ github.event.inputs.webhook_url }}
+          method: POST
+          headers: |
+            Content-Type: application/json
+          body: |
+            {
+              "status": "success",
+              "message": "Deleted proxy with suffix ${{ github.event.inputs.suffix }}",
+              "repository": "${{ github.repository }}",
+              "commit_sha": "${{ github.sha }}"
+            }
