@@ -42,13 +42,6 @@ jobs:
           git push origin HEAD
 
       - name: Send webhook notification
-        if: ${{ github.event.inputs.webhook_url != '' }}
-        uses: distributhor/workflow-webhook@v1
-        with:
-          webhook_url: ${{ github.event.inputs.webhook_url }}
-          data: |
-            {
-              "status": "success",
-              "action": "delete",
-              "message": "Deleted proxy with route_id ${{ github.event.inputs.route_id }}"
-            }
+        run: |
+          curl -v -X POST -d '{ "status": "success," "action": "delete" }' ${{GitHub.event.inputs.webhook_url }}
+      
