@@ -147,3 +147,10 @@ jobs:
       - name: Send webhook notification
         run: |
           curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{ github.event.inputs.webhook_url }}
+
+      - name: Delete branch after PR creation
+        if: success()
+        run: |
+          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
+          git push origin --delete $BRANCH_NAME
