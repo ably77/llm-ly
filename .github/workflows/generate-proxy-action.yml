@@ -30,7 +30,7 @@ jobs:
   update-manifest:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.route_id }}
       cancel-in-progress: false
 
     steps:
