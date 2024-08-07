@@ -49,15 +49,19 @@ jobs:
       - name: Commit and push changes
         run: |
           git commit -m "Deleted llm proxy manifest with route_id ${{ github.event.inputs.route_id }} using GitHub Action"
-          git push origin ${{ env.BRANCH_NAME }}
+          for i in {1..5}; do
+            git push origin ${{ env.BRANCH_NAME }} && break || (git fetch origin main && git rebase origin/main && sleep $((i*2)))
+          done
 
       - name: Merge branch into main
         run: |
-          git fetch origin main
-          git checkout main
-          git pull origin main
-          git merge --allow-unrelated-histories --no-ff ${{ env.BRANCH_NAME }}
-          git push origin main || (git pull --rebase origin main && git push origin main)
+          for i in {1..5}; do
+            git fetch origin main
+            git checkout main
+            git pull origin main
+            git merge --allow-unrelated-histories --no-ff ${{ env.BRANCH_NAME }}
+            git push origin main && break || (git pull --rebase origin main && sleep $((i*2)))
+          done
 
       - name: Delete branch after merge
         run: |
