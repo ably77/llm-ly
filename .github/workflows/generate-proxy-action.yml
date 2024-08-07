@@ -29,9 +29,6 @@ on:
 jobs:
   update-manifest:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: false
 
     steps:
       - name: Checkout repository
@@ -124,19 +121,12 @@ jobs:
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
       
-      - name: Pull latest changes with rebase
-        run: |
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git pull --rebase origin main
-      
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Configured new llm proxy using github action
           file_pattern: |
             ${{ env.FILE_PATH }}
-            
       - name: Send webhook notification
         run: |
           curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{GitHub.event.inputs.webhook_url }}
