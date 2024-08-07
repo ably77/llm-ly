@@ -147,7 +147,7 @@ jobs:
           git fetch origin main
           git checkout main
           git pull origin main
-          git merge --no-ff ${{ env.BRANCH_NAME }}
+          git merge --allow-unrelated-histories --no-ff ${{ env.BRANCH_NAME }}
           git push origin main || (git pull --rebase origin main && git push origin main)
 
       - name: Delete branch after merge
