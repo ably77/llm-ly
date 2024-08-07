@@ -130,6 +130,8 @@ jobs:
           commit_message: Configured new llm proxy using github action
           file_pattern: |
             ${{ env.FILE_PATH }}
+          pull_before_push: true
+            
       - name: Send webhook notification
         run: |
           curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{GitHub.event.inputs.webhook_url }}
