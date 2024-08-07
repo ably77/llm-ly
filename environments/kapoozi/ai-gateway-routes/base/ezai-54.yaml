@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-43
+  name: ezai-54
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -17,9 +17,9 @@ spec:
     helm:
       values: |
         metadata:
-          name: "ezai-43"
+          name: "ezai-54"
           labels:
-            prefixPath: "pveb"
+            prefixPath: "rith"
         spec:
           hostnames:
           - "ezai.kapoozi.com"
@@ -27,6 +27,10 @@ spec:
             - name: https
               namespace: gloo-system
           rules:
+          - backendRefName: gemini
+            pathPrefix: /gemini
+            routeOptionName: gemini-route-policies
+            useRandomPathPrefix: true
           - backendRefName: openai
             pathPrefix: /openai
             routeOptionName: openai-route-policies
