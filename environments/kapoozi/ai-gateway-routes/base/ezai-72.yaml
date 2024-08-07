@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezai-70
+  name: ezai-72
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -17,9 +17,9 @@ spec:
     helm:
       values: |
         metadata:
-          name: "ezai-70"
+          name: "ezai-72"
           labels:
-            prefixPath: "4eju"
+            prefixPath: "xc3n"
         spec:
           hostnames:
           - "ezai.kapoozi.com"
