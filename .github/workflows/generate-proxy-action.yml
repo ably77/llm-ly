@@ -145,6 +145,7 @@ jobs:
         run: |
           git fetch origin
           git checkout main
+          git pull origin main
           git merge --no-ff ${{ env.BRANCH_NAME }}
           git push origin main
 
