@@ -34,6 +34,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Create a unique branch
+        id: create_branch
+        run: |
+          BRANCH_NAME="proxy-update-${{ github.run_id }}-${{ github.event.inputs.route_id }}"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
       - name: Render manifest based on input
         id: render_manifest
         run: |  
@@ -125,8 +132,21 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Configured new llm proxy using github action
+          branch: ${{ env.BRANCH_NAME }}
           file_pattern: |
             ${{ env.FILE_PATH }}
+
+      - name: Merge branch
+        run: |
+          git fetch origin
+          git checkout main
+          git merge --no-ff ${{ env.BRANCH_NAME }}
+          git push origin main
+
+      - name: Delete branch after merge
+        run: |
+          git push origin --delete ${{ env.BRANCH_NAME }}
+
       - name: Send webhook notification
         run: |
-          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{GitHub.event.inputs.webhook_url }}
+          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{ github.event.inputs.webhook_url }}
