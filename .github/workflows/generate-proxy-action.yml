@@ -142,7 +142,7 @@ jobs:
         run: |
           gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
-          PR_URL=$(gh pr create --fill --base main --head $BRANCH_NAME --json url -q ".url")
+          PR_URL=$(gh pr create --fill --base main --head $BRANCH_NAME --web)
           echo "PR_URL=$PR_URL" >> $GITHUB_ENV
 
       - name: Merge the pull request
