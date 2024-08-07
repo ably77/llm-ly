@@ -30,21 +30,16 @@ jobs:
   update-manifest:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
+      group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: false
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Create a new branch
-        run: |
-          BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
-          git checkout -b $BRANCH_NAME
-
       - name: Render manifest based on input
         id: render_manifest
-        run: |
+        run: |  
           ROUTE_ID=${{ github.event.inputs.route_id }}
           RANDOM_PATH_PREFIX=${{ github.event.inputs.random_path_prefix }}
           ROUTES=${{ github.event.inputs.routes }}
@@ -128,36 +123,13 @@ jobs:
           EOF
 
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
-
-      - name: Commit and push changes to the new branch
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
-          git add ${{ env.FILE_PATH }}
-          git commit -m "Configured new llm proxy using github action"
-          git push origin $BRANCH_NAME
-
-      - name: Create a pull request
-        id: create_pr
-        run: |
-          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
-          PR_URL=$(gh pr create --fill --base main --head $BRANCH_NAME --json url -q .url)
-          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
-
-      - name: Merge the pull request
-        run: |
-          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
-          PR_URL=${{ env.PR_URL }}
-          gh pr merge $PR_URL --merge --auto
-
-      - name: Delete branch after PR merge
-        run: |
-          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
-          git push origin --delete $BRANCH_NAME
-
+      
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Configured new llm proxy using github action
+          file_pattern: |
+            ${{ env.FILE_PATH }}
       - name: Send webhook notification
         run: |
-          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{ github.event.inputs.webhook_url }}
+          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{GitHub.event.inputs.webhook_url }}
