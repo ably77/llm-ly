@@ -142,15 +142,21 @@ jobs:
         run: |
           gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
-          gh pr create --fill --base main --head $BRANCH_NAME
+          PR_URL=$(gh pr create --fill --base main --head $BRANCH_NAME --json url -q ".url")
+          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
 
-      - name: Send webhook notification
+      - name: Merge the pull request
         run: |
-          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{ github.event.inputs.webhook_url }}
+          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
+          PR_URL=${{ env.PR_URL }}
+          gh pr merge $PR_URL --merge --auto
 
-      - name: Delete branch after PR creation
-        if: success()
+      - name: Delete branch after PR merge
         run: |
           gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME="update-proxy-${{ github.event.inputs.route_id }}-${{ github.run_id }}"
           git push origin --delete $BRANCH_NAME
+
+      - name: Send webhook notification
+        run: |
+          curl -v -L -X POST -d '{ "status": "success", "action": "create" }' ${{ github.event.inputs.webhook_url }}
